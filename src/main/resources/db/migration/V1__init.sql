@@ -63,7 +63,8 @@ AS
     RETURN @@Error
 
 GO
-ALTER PROCEDURE [dbo].[uspUserUpdate]
+
+CREATE PROCEDURE [dbo].[uspUserUpdate]
 @id BIGINT,
 @firstname NVARCHAR(50) = NULL,
 @lastname NVARCHAR(50) = NULL,
