@@ -30,8 +30,7 @@ public class UserDaoImpl extends AbstractBaseDao<User> implements UserDao {
         update = new SimpleJdbcCall(dataSource).withProcedureName("uspUserUpdate").withReturnValue();
         find = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUser").returningResultSet(SINGLE_RESULT,new BeanPropertyRowMapper<>(User.class));
         findAll = new SimpleJdbcCall(dataSource).withProcedureName("uspFindAllUser").returningResultSet(RESULT_COUNT, new RowCountMapper()).returningResultSet(MULTIPLE_RESULT, new BeanPropertyRowMapper<>(User.class));
-
-
+        findById = new SimpleJdbcCall(dataSource).withProcedureName("uspFindById").returningResultSet(SINGLE_RESULT, new BeanPropertyRowMapper<>(User.class));
     }
 
     @Override
@@ -59,7 +58,13 @@ public class UserDaoImpl extends AbstractBaseDao<User> implements UserDao {
 
     @Override
     public User findById(long id) {
-        return null;
+        SqlParameterSource in = new MapSqlParameterSource().addValue("id", id);
+        Map<String,Object> m = findById.execute(in);
+        List<User>list = (List<User>) m.get(SINGLE_RESULT);
+        if(list==null || list.isEmpty()){
+            return null;
+        }
+        return list.get(0);
     }
 }
 

@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements IUserService {
     @Autowired
      UserDao userDao;
 
@@ -27,8 +27,6 @@ public class UserServiceImpl implements UserService{
             throw new RequestException("User not found");
         user.setId(id);
         return userDao.update(user);
-
-
     }
 
     @Override

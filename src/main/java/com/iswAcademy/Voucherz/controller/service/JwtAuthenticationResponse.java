@@ -1,4 +1,4 @@
-package com.iswAcademy.Voucherz.controller.model;
+package com.iswAcademy.Voucherz.controller.service;
 
 public class JwtAuthenticationResponse {
     private String accessToken;

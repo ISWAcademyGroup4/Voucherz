@@ -1,24 +1,24 @@
 package com.iswAcademy.Voucherz.controller;
 
 
-import com.iswAcademy.Voucherz.controller.model.Response;
-import com.iswAcademy.Voucherz.domain.UpdateUserRequest;
+import com.iswAcademy.Voucherz.controller.service.Response;
+import com.iswAcademy.Voucherz.controller.model.UpdateUserRequest;
 import com.iswAcademy.Voucherz.domain.User;
 import com.iswAcademy.Voucherz.controller.model.UserRegistrationRequest;
-import com.iswAcademy.Voucherz.service.UserService;
+import com.iswAcademy.Voucherz.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/api/v1/users", consumes = "application/json", produces = "application/json")
+@RequestMapping(value = "/api/V1/users", consumes = "application/json", produces = "application/json")
 public class UserController {
 
     @Autowired
-    private UserService userService;
+    private IUserService userService;
 
-    public UserController(UserService userService) {
+    public UserController(IUserService userService) {
         this.userService = userService;
     }
 

@@ -1,14 +1,16 @@
 package com.iswAcademy.Voucherz.controller;
 
-import com.iswAcademy.Voucherz.controller.model.JwtAuthenticationResponse;
+import com.iswAcademy.Voucherz.controller.service.JwtAuthenticationResponse;
 import com.iswAcademy.Voucherz.controller.model.LoginInRequest;
-import com.iswAcademy.Voucherz.controller.model.Response;
+import com.iswAcademy.Voucherz.controller.service.Response;
 import com.iswAcademy.Voucherz.controller.model.UserRegistrationRequest;
+import com.iswAcademy.Voucherz.dao.UserDao;
 import com.iswAcademy.Voucherz.dao.util.JwtTokenProvider;
 import com.iswAcademy.Voucherz.domain.RoleName;
+import com.iswAcademy.Voucherz.controller.model.UpdateUserRequest;
 import com.iswAcademy.Voucherz.domain.User;
 import com.iswAcademy.Voucherz.service.RoleService;
-import com.iswAcademy.Voucherz.service.UserService;
+import com.iswAcademy.Voucherz.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -35,8 +38,10 @@ public class AuthController {
     AuthenticationManager authenticationManager;
 
     @Autowired
-    UserService userService;
+    IUserService userService;
 
+    @Autowired
+    UserDao userDao;
 
     @Autowired
     RoleService roleService;
@@ -91,6 +96,19 @@ public class AuthController {
 
     }
 
+    @RequestMapping(value = "/update/{id}", method = RequestMethod.PATCH)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Response updateUser(@PathVariable("id") long id, @RequestBody @Validated final UpdateUserRequest request) {
+        User user = userDao.findById(id);
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setCompanySize(request.getCompanySize());
+        userService.updateUser(id,user);
+        return  new Response ("200", "Updated");
 
+    }
 
 }

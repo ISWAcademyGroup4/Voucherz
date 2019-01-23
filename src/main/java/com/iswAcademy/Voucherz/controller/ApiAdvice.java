@@ -3,7 +3,7 @@ package com.iswAcademy.Voucherz.controller;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.iswAcademy.Voucherz.controller.model.Response;
+import com.iswAcademy.Voucherz.controller.service.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
@@ -11,7 +11,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import com.iswAcademy.Voucherz.controller.model.Error;
+import com.iswAcademy.Voucherz.controller.service.Error;
 import java.util.ArrayList;
 import java.util.List;
 

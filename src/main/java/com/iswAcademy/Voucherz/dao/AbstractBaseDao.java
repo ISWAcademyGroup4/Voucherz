@@ -17,7 +17,7 @@ import java.util.Map;
 public abstract class AbstractBaseDao <T extends BaseEntity> implements BaseDao<T >{
 
     protected JdbcTemplate jdbcTemplate;
-    protected SimpleJdbcCall create, update, delete, find, findAll;
+    protected SimpleJdbcCall create, update, delete, find, findAll, findById;
 
     protected final String SINGLE_RESULT = "object";
     protected final String MULTIPLE_RESULT = "list";

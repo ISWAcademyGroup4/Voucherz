@@ -66,12 +66,12 @@ GO
 
 CREATE PROCEDURE [dbo].[uspUserUpdate]
 @id BIGINT,
-@firstname NVARCHAR(50) = NULL,
-@lastname NVARCHAR(50) = NULL,
+@firstName NVARCHAR(50) = NULL,
+@lastName NVARCHAR(50) = NULL,
 @password NVARCHAR(50) = NULL,
 @email NVARCHAR(50) = NULL,
-@phonenumber NVARCHAR(50) = NULL,
-@companysize INT = NULL
+@phoneNumber NVARCHAR(50) = NULL,
+@companySize INT = NULL
 
 AS
 BEGIN
@@ -83,4 +83,3 @@ UPDATE Users
 SET FirstName = isNULL(@firstname,FirstName ), LastName = isNuLL(@lastname,LastName), [Password] = isNULL(@password,[Password]), Email = isNULL(@email,Email), PhoneNumber = isNULL(@phonenumber,PhoneNumber), CompanySize = isNULL(@companysize,CompanySize)
 WHERE (UserId = @id)
 END
-GO

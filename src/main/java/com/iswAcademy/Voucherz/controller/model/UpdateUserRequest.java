@@ -1,23 +1,24 @@
 package com.iswAcademy.Voucherz.controller.model;
 
+import com.iswAcademy.Voucherz.controller.model.UserRegistrationRequest;
 import org.hibernate.validator.constraints.Length;
+
 import javax.validation.constraints.NotBlank;
 
-public class UserRegistrationRequest extends LoginInRequest {
+public class UpdateUserRequest {
 
-    @Length(min=3, max =50)
-    @NotBlank(message = "required")
     private String FirstName;
 
-    @Length(min=3, max=50)
-    @NotBlank(message = "required")
     private String LastName;
 
-    @Length(min=3, max = 20)
-    @NotBlank(message="required")
+    private String Email;
+
+    private String Password;
+
     private String PhoneNumber;
 
     private int CompanySize;
+
 
     public String getFirstName() {
         return FirstName;
@@ -35,6 +36,21 @@ public class UserRegistrationRequest extends LoginInRequest {
         LastName = lastName;
     }
 
+    public String getEmail() {
+        return Email;
+    }
+
+    public void setEmail(String email) {
+        Email = email;
+    }
+
+    public String getPassword() {
+        return Password;
+    }
+
+    public void setPassword(String password) {
+        Password = password;
+    }
 
     public String getPhoneNumber() {
         return PhoneNumber;
@@ -51,6 +67,4 @@ public class UserRegistrationRequest extends LoginInRequest {
     public void setCompanySize(int companySize) {
         CompanySize = companySize;
     }
-
-
 }
