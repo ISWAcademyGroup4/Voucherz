@@ -18,18 +18,20 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/auth")
-
 public class AuthController {
 
     protected Logger logger = Logger.getLogger(AuthController.class.getName());
@@ -103,12 +105,23 @@ public class AuthController {
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhoneNumber(request.getPhoneNumber());
         user.setCompanySize(request.getCompanySize());
         userService.updateUser(id,user);
         return  new Response ("200", "Updated");
 
+    }
+
+    @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
+    public Response resetPassword(HttpServletRequest request, @RequestParam("email") String userEmail) {
+        User user = userService.findUser(userEmail);
+        if(user == null) {
+            throw new UsernameNotFoundException("Invalid Email Address");
+        }
+        String token = UUID.randomUUID().toString();
+
+        return null;
     }
 
 }
