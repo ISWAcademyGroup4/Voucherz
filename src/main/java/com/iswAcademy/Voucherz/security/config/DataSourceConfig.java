@@ -1,4 +1,4 @@
-package com.iswAcademy.Voucherz.config;
+package com.iswAcademy.Voucherz.security.config;
 
 public class DataSourceConfig {
 

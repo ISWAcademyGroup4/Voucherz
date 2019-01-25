@@ -1,7 +1,6 @@
-package com.iswAcademy.Voucherz.dao.util;
+package com.iswAcademy.Voucherz.security.util;
 
 import com.iswAcademy.Voucherz.security.UserPrincipal;
-
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +33,8 @@ public class JwtTokenProvider {
 
         Claims claims = Jwts.claims().setSubject(userPrincipal.getEmail());
         return Jwts.builder()
-                // set sub
-//                .setSubject(userPrincipal.getUsername())
+                .setSubject(userPrincipal.getUsername())
+                .setSubject(userPrincipal.getId().toString())
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)

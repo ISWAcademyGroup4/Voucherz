@@ -1,17 +1,18 @@
-package com.iswAcademy.Voucherz.service.mail;
+package com.iswAcademy.Voucherz.mailservice;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
-import org.thymeleaf.TemplateEngine;
+import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
 
+@Service
 public class MailService implements IMailService {
 
     @Autowired
@@ -38,6 +39,7 @@ public class MailService implements IMailService {
             messageHelper.setSubject(mail.getSubject());
             messageHelper.setFrom(mail.getFrom());
 
+            emailSender.send(mimeMessage);
         }catch (Exception e) {
             throw new RuntimeException();
         }

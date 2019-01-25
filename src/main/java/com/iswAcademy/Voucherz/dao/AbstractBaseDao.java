@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractBaseDao <T extends BaseEntity> implements BaseDao<T >{
+public abstract class AbstractBaseDao <T extends BaseEntity> implements IBaseDao<T > {
 
     protected JdbcTemplate jdbcTemplate;
     protected SimpleJdbcCall create, update, delete, find, findAll, findById;

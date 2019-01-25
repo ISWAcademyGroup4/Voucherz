@@ -1,7 +1,7 @@
 package com.iswAcademy.Voucherz.service;
 
 
-import com.iswAcademy.Voucherz.dao.UserDao;
+import com.iswAcademy.Voucherz.dao.IUserDao;
 import com.iswAcademy.Voucherz.domain.User;
 import com.iswAcademy.Voucherz.exception.RequestException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements IUserService {
     @Autowired
-     UserDao userDao;
+    IUserDao userDao;
 
     @Override
     public User createUser(User user){

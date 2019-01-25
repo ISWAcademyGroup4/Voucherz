@@ -4,8 +4,8 @@ import com.iswAcademy.Voucherz.controller.service.JwtAuthenticationResponse;
 import com.iswAcademy.Voucherz.controller.model.LoginInRequest;
 import com.iswAcademy.Voucherz.controller.service.Response;
 import com.iswAcademy.Voucherz.controller.model.UserRegistrationRequest;
-import com.iswAcademy.Voucherz.dao.UserDao;
-import com.iswAcademy.Voucherz.dao.util.JwtTokenProvider;
+import com.iswAcademy.Voucherz.dao.IUserDao;
+import com.iswAcademy.Voucherz.security.util.JwtTokenProvider;
 import com.iswAcademy.Voucherz.domain.RoleName;
 import com.iswAcademy.Voucherz.controller.model.UpdateUserRequest;
 import com.iswAcademy.Voucherz.domain.User;
@@ -43,7 +43,7 @@ public class AuthController {
     IUserService userService;
 
     @Autowired
-    UserDao userDao;
+    IUserDao userDao;
 
     @Autowired
     RoleService roleService;

@@ -1,4 +1,4 @@
-package com.iswAcademy.Voucherz.config;
+package com.iswAcademy.Voucherz.security.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

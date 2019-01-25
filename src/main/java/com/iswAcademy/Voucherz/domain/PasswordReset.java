@@ -1,73 +1,39 @@
 package com.iswAcademy.Voucherz.domain;
 
-import java.util.Date;
-import java.util.Objects;
+import javax.validation.constraints.NotEmpty;
 
 public class PasswordReset {
 
-    private long id;
+    @NotEmpty
+    private String password;
 
-    private Date expiryDate;
+    @NotEmpty
+    private String confirmPassword;
 
-    private User user;
+    @NotEmpty
+    private String token;
 
-    private String email;
-
-    public long getId() {
-        return id;
+    public String getPassword() {
+        return password;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
-    public Date getExpiryDate() {
-        return expiryDate;
+    public String getConfirmPassword() {
+        return confirmPassword;
     }
 
-    public void setExpiryDate(Date expiryDate) {
-        this.expiryDate = expiryDate;
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
     }
 
-    public User getUser() {
-        return user;
+    public String getToken() {
+        return token;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @Override
-    public String toString() {
-        return "PasswordReset{" +
-                "id=" + id +
-                ", expiryDate=" + expiryDate +
-                ", user=" + user +
-                ", email='" + email + '\'' +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        PasswordReset that = (PasswordReset) o;
-        return id == that.id &&
-                Objects.equals(expiryDate, that.expiryDate) &&
-                Objects.equals(user, that.user) &&
-                Objects.equals(email, that.email);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, expiryDate, user, email);
+    public void setToken(String token) {
+        this.token = token;
     }
 }

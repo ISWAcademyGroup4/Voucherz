@@ -1,4 +1,4 @@
-package com.iswAcademy.Voucherz.service.mail;
+package com.iswAcademy.Voucherz.mailservice;
 
 
 public interface IMailService {

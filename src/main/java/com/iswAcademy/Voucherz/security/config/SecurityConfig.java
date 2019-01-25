@@ -1,4 +1,4 @@
-package com.iswAcademy.Voucherz.config;
+package com.iswAcademy.Voucherz.security.config;
 
 import com.iswAcademy.Voucherz.security.CustomUserDetailsService;
 import com.iswAcademy.Voucherz.security.JwtAuthenticationEntryPoint;
@@ -72,7 +72,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/auth/signin" ,"/api/auth/signup", "/api/auth/**" )
+                .antMatchers("/api/auth/signin" ,"/api/auth/signup", "/api/auth/**","/api/password/forgot**","/api/password/reset**")
                 .permitAll()
                 .anyRequest()
                 .authenticated();

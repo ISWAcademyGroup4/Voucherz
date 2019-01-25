@@ -2,7 +2,7 @@ package com.iswAcademy.Voucherz.dao;
 
 import java.util.List;
 
-public interface BaseDao<T> {
+public interface IBaseDao<T> {
     public T create(T Model);
 
     public boolean update(T model);
