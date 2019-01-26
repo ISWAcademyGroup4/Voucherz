@@ -30,8 +30,8 @@ public class JwtTokenProvider {
         Date now = new Date();
 
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
-
         Claims claims = Jwts.claims().setSubject(userPrincipal.getEmail());
+
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
                 .setSubject(userPrincipal.getId().toString())

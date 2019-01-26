@@ -1,6 +1,7 @@
 package com.iswAcademy.Voucherz.controller;
 
 import com.iswAcademy.Voucherz.dao.IUserDao;
+import com.iswAcademy.Voucherz.domain.PasswordReset;
 import com.iswAcademy.Voucherz.domain.PasswordResetToken;
 import com.iswAcademy.Voucherz.domain.User;
 import com.iswAcademy.Voucherz.mailservice.IMailService;
@@ -13,18 +14,20 @@ import com.iswAcademy.Voucherz.util.TokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/api/password")
-public class PasswordController {
+@RequestMapping(value = "/api/password/forgot")
+public class ForgotPasswordController {
 
     @Autowired
     private IUserService userService;
@@ -38,11 +41,16 @@ public class PasswordController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @ModelAttribute("passwordresetform")
+    public PasswordReset passwordReset() {
+        return new PasswordReset();
+    }
+
     @Autowired
     IUserDao userDao;
 
-    @RequestMapping(value="/forgot", method = RequestMethod.POST)
-    public Response forgot(@RequestParam("email") String email, HttpServletRequest request) {
+    @RequestMapping(method = RequestMethod.POST)
+    public String forgot(@RequestParam("email") String email, HttpServletRequest request) {
         User user = userDao.findByEmail(email);
         if(user == null) {
             throw new UsernameNotFoundException("This email does not Exist ");
@@ -62,15 +70,10 @@ public class PasswordController {
         model.put("user", user);
         model.put("signature", "https://Voucherzng.com");
         String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        model.put("resetUrl", url + "/reset-password?token=" + token.getToken());
+        model.put("resetUrl", url + "/password/forgot?token=" + token.getToken());
         mail.setModel(model);
         mailService.sendEmail(mail);
-        return new Response("200","Kindly check your mail ");
+        return "redirect:/password/forgot?success";
     }
 
-    @RequestMapping(value="reset", method = RequestMethod.POST)
-    public Response reset() {
-
-        return new Response("200","Kindly check your mailservice ");
-    }
 }

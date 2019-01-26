@@ -35,8 +35,6 @@ public class PasswordResetToken extends BaseEntity{
         this.expiryDate = expiryDate;
     }
 
-
-
     public void setExpiryDate(int minutes) {
         Calendar now = Calendar.getInstance();
         now.add(Calendar.MINUTE, minutes);

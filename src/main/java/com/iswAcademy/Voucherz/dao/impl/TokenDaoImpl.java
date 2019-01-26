@@ -30,23 +30,14 @@ public class TokenDaoImpl extends AbstractBaseDao<PasswordResetToken> implements
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         create = new SimpleJdbcCall(dataSource).withProcedureName("uspTokenGen").withReturnValue();
         update = new SimpleJdbcCall(dataSource).withProcedureName("uspUserUpdate").withReturnValue();
-        find = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUser").returningResultSet(SINGLE_RESULT,new BeanPropertyRowMapper<>(User.class));
+        find = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUserByToken").returningResultSet(SINGLE_RESULT,new BeanPropertyRowMapper<>(PasswordResetToken.class));
     }
 
-//    @Override
-//    public PasswordResetToken findByEmail(String Email) {
-//        SqlParameterSource in = new MapSqlParameterSource().addValue("email", Email);
-//        Map<String,Object> m = find.execute(in);
-//        List<PasswordResetToken> list = (List<PasswordResetToken>) m.get(SINGLE_RESULT);
-//        if(list==null || list.isEmpty()){
-//            return null;
-//        }
-//        return list.get(0);
-//    }
+
 
     @Override
-    public PasswordResetToken find(String email) {
-        SqlParameterSource in = new MapSqlParameterSource().addValue("email", email);
+    public PasswordResetToken find(String token) {
+        SqlParameterSource in = new MapSqlParameterSource().addValue("token", token);
         Map<String,Object> m = find.execute(in);
         List<PasswordResetToken>list = (List<PasswordResetToken>) m.get(SINGLE_RESULT);
         if(list==null || list.isEmpty()){
@@ -61,6 +52,17 @@ public class TokenDaoImpl extends AbstractBaseDao<PasswordResetToken> implements
         SqlParameterSource in = new MapSqlParameterSource().addValue("id", id);
         Map<String,Object> m = findById.execute(in);
         List<PasswordResetToken>list = (List<PasswordResetToken>) m.get(SINGLE_RESULT);
+        if(list==null || list.isEmpty()){
+            return null;
+        }
+        return list.get(0);
+    }
+
+    @Override
+    public User findUserByToken(String token) {
+        SqlParameterSource in = new MapSqlParameterSource().addValue("token", token);
+        Map<String,Object> m = find.execute(in);
+        List<User>list = (List<User>) m.get(SINGLE_RESULT);
         if(list==null || list.isEmpty()){
             return null;
         }

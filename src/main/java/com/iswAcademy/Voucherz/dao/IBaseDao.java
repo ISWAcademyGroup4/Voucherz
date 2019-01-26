@@ -7,7 +7,7 @@ public interface IBaseDao<T> {
 
     public boolean update(T model);
 
-    public T find(String email);
+    public T find(String token);
 
     public T findById(long id);
 
