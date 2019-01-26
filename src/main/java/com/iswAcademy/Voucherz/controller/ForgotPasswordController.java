@@ -1,6 +1,7 @@
 package com.iswAcademy.Voucherz.controller;
 
 import com.iswAcademy.Voucherz.dao.IUserDao;
+import com.iswAcademy.Voucherz.domain.ForgotPassword;
 import com.iswAcademy.Voucherz.domain.PasswordReset;
 import com.iswAcademy.Voucherz.domain.PasswordResetToken;
 import com.iswAcademy.Voucherz.domain.User;
@@ -14,6 +15,7 @@ import com.iswAcademy.Voucherz.util.TokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -25,8 +27,8 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController
-@RequestMapping(value = "/api/password/forgot")
+@Controller
+@RequestMapping(value = "/forgot-password")
 public class ForgotPasswordController {
 
     @Autowired
@@ -41,17 +43,26 @@ public class ForgotPasswordController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @ModelAttribute("passwordresetform")
-    public PasswordReset passwordReset() {
-        return new PasswordReset();
-    }
-
     @Autowired
     IUserDao userDao;
 
+    @ModelAttribute("forgotPasswordForm")
+    public ForgotPassword forgotPassword() {
+        return new ForgotPassword();
+    }
+
+    @GetMapping
+    public String displayForgotPasswordPage() {
+        return "forgot-password";
+    }
+
     @RequestMapping(method = RequestMethod.POST)
-    public String forgot(@RequestParam("email") String email, HttpServletRequest request) {
-        User user = userDao.findByEmail(email);
+    public String forgot(@ModelAttribute("forgotPasswordForm") @Valid ForgotPassword resetEmail,
+                         BindingResult result, HttpServletRequest request) {
+        if (result.hasErrors()){
+            return "forgot-password";
+        }
+        User user = userDao.findByEmail(resetEmail.getEmail());
         if(user == null) {
             throw new UsernameNotFoundException("This email does not Exist ");
         }
@@ -70,10 +81,10 @@ public class ForgotPasswordController {
         model.put("user", user);
         model.put("signature", "https://Voucherzng.com");
         String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        model.put("resetUrl", url + "/password/forgot?token=" + token.getToken());
+        model.put("resetUrl", url + "/reset-password?token=" + token.getToken());
         mail.setModel(model);
         mailService.sendEmail(mail);
-        return "redirect:/password/forgot?success";
+        return "redirect:/forgot-password?success";
     }
 
 }

@@ -9,6 +9,7 @@ import com.iswAcademy.Voucherz.service.ITokenService;
 import com.iswAcademy.Voucherz.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,8 +19,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.validation.Valid;
 
 
-@RestController
-@RequestMapping(value = "/api/password/reset")
+@Controller
+@RequestMapping(value = "/reset-password")
 public class ResetPasswordController {
 
     @Autowired
@@ -34,17 +35,16 @@ public class ResetPasswordController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @ModelAttribute("passwordresetform")
+    @Autowired
+    IUserDao userDao;
+
+    @ModelAttribute("passwordResetForm")
     public PasswordReset passwordReset() {
         return new PasswordReset();
     }
 
-    @Autowired
-    IUserDao userDao;
-
-
     @GetMapping
-    public String resetpasspage(@RequestParam(required = false) String token, Model model) {
+    public String displayResetPasswordPage(@RequestParam(required = false) String token, Model model) {
         PasswordResetToken passwordResetToken = tokenService.findByToken(token);
         if (passwordResetToken == null) {
             model.addAttribute("error", "Could not find password reset token.");
@@ -58,19 +58,21 @@ public class ResetPasswordController {
 
     @RequestMapping(method = RequestMethod.POST)
     @Transactional
-    public String reset(@RequestBody @Valid final PasswordReset resetrequest,
+    public String reset(@ModelAttribute("passwordResetForm") @Valid final PasswordReset resetrequest,
                         BindingResult result,
                         RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             redirectAttributes.addFlashAttribute(BindingResult.class.getName() + ".passwordResetForm", result);
             redirectAttributes.addFlashAttribute("passwordResetForm", resetrequest);
-            return "redirect:/password/reset?token=" + resetrequest.getToken();
+            return "redirect:/reset-password?token=" + resetrequest.getToken();
         }
 
 //        PasswordResetToken passwordResetToken = tokenService.findByToken(resetrequest.getToken());
         User user = tokenService.findUserByToken(resetrequest.getToken());
         String updatePassword = passwordEncoder.encode(resetrequest.getPassword());
 //        userService.updatePassword(user.getId(),updatePassword);
-        return "redirect:/login?resetSuccess";
+//        return "redirect:/login?resetSuccess";
+
+        return "redirect:/api/auth/signin";
     }
 }
