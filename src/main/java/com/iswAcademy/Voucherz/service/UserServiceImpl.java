@@ -30,9 +30,17 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public boolean updatePassword(User user){
+        return userDao.update(user);
+    }
+
+    @Override
     public User findUser(String Email) {
         return userDao.find(Email);
     }
 
+    public User findByToken(String token) {
+        return userDao.findUserByToken(token);
+    }
 
 }

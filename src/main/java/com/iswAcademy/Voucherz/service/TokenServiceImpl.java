@@ -21,15 +21,6 @@ public class TokenServiceImpl implements ITokenService {
         return tokenDao.create(token);
     }
 
-    @Override
-    public PasswordResetToken findByToken(String token) {
-        return null;
-    }
-
-    @Override
-    public User findUserByToken(String token) {
-        return tokenDao.findUserByToken(token);
-    }
 
 
 }

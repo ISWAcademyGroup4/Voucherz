@@ -9,7 +9,6 @@ import com.iswAcademy.Voucherz.security.util.JwtTokenProvider;
 import com.iswAcademy.Voucherz.domain.RoleName;
 import com.iswAcademy.Voucherz.controller.model.UpdateUserRequest;
 import com.iswAcademy.Voucherz.domain.User;
-import com.iswAcademy.Voucherz.service.RoleService;
 import com.iswAcademy.Voucherz.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,10 +43,6 @@ public class AuthController {
 
     @Autowired
     IUserDao userDao;
-
-    @Autowired
-    RoleService roleService;
-
 
     @Autowired
     PasswordEncoder passwordEncoder;

@@ -1,6 +1,7 @@
 package com.iswAcademy.Voucherz.controller;
 
 import com.iswAcademy.Voucherz.dao.IUserDao;
+import com.iswAcademy.Voucherz.domain.ApiPasswordReset;
 import com.iswAcademy.Voucherz.domain.PasswordReset;
 import com.iswAcademy.Voucherz.domain.PasswordResetToken;
 import com.iswAcademy.Voucherz.domain.User;
@@ -19,7 +20,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.validation.Valid;
 
 
-@Controller
+//@Controller
+@RestController
 @RequestMapping(value = "/reset-password")
 public class ResetPasswordController {
 
@@ -45,14 +47,14 @@ public class ResetPasswordController {
 
     @GetMapping
     public String displayResetPasswordPage(@RequestParam(required = false) String token, Model model) {
-        PasswordResetToken passwordResetToken = tokenService.findByToken(token);
-        if (passwordResetToken == null) {
-            model.addAttribute("error", "Could not find password reset token.");
-        } else if (passwordResetToken.isExpired()) {
-            model.addAttribute("error", "Token has expired, please request a new password reset.");
-        } else {
-            model.addAttribute("token", passwordResetToken.getToken());
-        }
+//        PasswordResetToken passwordResetToken = tokenService.findByToken(token);
+//        if (passwordResetToken == null) {
+//            model.addAttribute("error", "Could not find password reset token.");
+//        } else if (passwordResetToken.isExpired()) {
+//            model.addAttribute("error", "Token has expired, please request a new password reset.");
+//        } else {
+//            model.addAttribute("token", passwordResetToken.getToken());
+//        }
         return "reset-password";
     }
 
@@ -68,11 +70,30 @@ public class ResetPasswordController {
         }
 
 //        PasswordResetToken passwordResetToken = tokenService.findByToken(resetrequest.getToken());
-        User user = tokenService.findUserByToken(resetrequest.getToken());
-        String updatePassword = passwordEncoder.encode(resetrequest.getPassword());
+//        User user = passwordResetToken.getUser();
+//        String updatePassword = passwordEncoder.encode(resetrequest.getPassword());
 //        userService.updatePassword(user.getId(),updatePassword);
 //        return "redirect:/login?resetSuccess";
 
+        return "redirect:/api/auth/signin";
+    }
+
+
+    @RequestMapping(value ="/point", method = RequestMethod.POST)
+    @Transactional
+    public String reset2(@RequestParam("token") String token, @RequestBody @Valid final ApiPasswordReset resetrequest,
+                        BindingResult result,
+                        RedirectAttributes redirectAttributes) {
+        if (result.hasErrors()) {
+            redirectAttributes.addFlashAttribute(BindingResult.class.getName() + ".passwordResetForm", result);
+            redirectAttributes.addFlashAttribute("passwordResetForm", resetrequest);
+            return "redirect:/reset-password?token=" + token;
+        }
+
+        User user = userService.findByToken(token);
+        String updatedPassword = passwordEncoder.encode(resetrequest.getPassword());
+        user.setPassword(updatedPassword);
+        userService.updatePassword(user);
         return "redirect:/api/auth/signin";
     }
 }

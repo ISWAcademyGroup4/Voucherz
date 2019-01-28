@@ -28,9 +28,11 @@ public class UserDaoImpl extends AbstractBaseDao<User> implements IUserDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         create = new SimpleJdbcCall(dataSource).withProcedureName("uspCreateUser2").withReturnValue();
         update = new SimpleJdbcCall(dataSource).withProcedureName("uspUserUpdate").withReturnValue();
+        updatePassword = new SimpleJdbcCall(dataSource).withProcedureName("uspUpdateUserPassword").withReturnValue();
         find = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUser").returningResultSet(SINGLE_RESULT,new BeanPropertyRowMapper<>(User.class));
         findAll = new SimpleJdbcCall(dataSource).withProcedureName("uspFindAllUser").returningResultSet(RESULT_COUNT, new RowCountMapper()).returningResultSet(MULTIPLE_RESULT, new BeanPropertyRowMapper<>(User.class));
         findById = new SimpleJdbcCall(dataSource).withProcedureName("uspFindById").returningResultSet(SINGLE_RESULT, new BeanPropertyRowMapper<>(User.class));
+        findUserByToken = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUserByToken3").returningResultSet(SINGLE_RESULT, new BeanPropertyRowMapper<>(User.class));
     }
 
     @Override
@@ -44,6 +46,7 @@ public class UserDaoImpl extends AbstractBaseDao<User> implements IUserDao {
         return list.get(0);
     }
 
+
     @Override
     public User find(String email) {
         SqlParameterSource in = new MapSqlParameterSource().addValue("email", email);
@@ -53,7 +56,6 @@ public class UserDaoImpl extends AbstractBaseDao<User> implements IUserDao {
             return null;
         }
         return list.get(0);
-
     }
 
     @Override

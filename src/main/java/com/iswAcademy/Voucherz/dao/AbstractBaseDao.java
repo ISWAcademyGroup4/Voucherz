@@ -17,7 +17,7 @@ import java.util.Map;
 public abstract class AbstractBaseDao <T extends BaseEntity> implements IBaseDao<T > {
 
     protected JdbcTemplate jdbcTemplate;
-    protected SimpleJdbcCall create, update, delete, find, findAll, findById;
+    protected SimpleJdbcCall create, update, delete, find, findAll, findById,updatePassword, findUserEmailByToken, findUser,findUserByToken;
 
     protected final String SINGLE_RESULT = "object";
     protected final String MULTIPLE_RESULT = "list";
@@ -42,6 +42,12 @@ public abstract class AbstractBaseDao <T extends BaseEntity> implements IBaseDao
         return true;
     }
 
+    public boolean updatePassword(T model) {
+        SqlParameterSource in = new BeanPropertySqlParameterSource(model);
+        updatePassword.execute(in);
+        return true;
+    }
+
     public boolean delete(T model) {
         return false;
     }
@@ -60,7 +66,15 @@ public abstract class AbstractBaseDao <T extends BaseEntity> implements IBaseDao
         return null;
     }
 
-
+    public T findUserByToken(String token) {
+        SqlParameterSource in = new MapSqlParameterSource().addValue("token",token);
+        Map<String, Object> m = findUserByToken.execute(in);
+        List<T> list = (List<T>) m.get(SINGLE_RESULT);
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
 
 
 }

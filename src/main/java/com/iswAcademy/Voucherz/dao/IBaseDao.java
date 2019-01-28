@@ -14,4 +14,9 @@ public interface IBaseDao<T> {
     public List<T> ReadAll();
 
     public boolean delete(T model);
+
+    public T findUserByToken(String token);
+
+    public boolean updatePassword(T model);
+
 }

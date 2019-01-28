@@ -10,6 +10,6 @@ SET NOCOUNT ON
 
 BEGIN TRANSACTION uspTokenGen
 
-INSERT INTO [dbo].PasswordReset(Email,ResetToken,ExpiryDate) VALUES (@email, @token, @expirydate)
+INSERT INTO [dbo].PasswordReset(Email,ResetToken,ExpiryDate) VALUES(@email, @token, @expirydate)
 
 COMMIT

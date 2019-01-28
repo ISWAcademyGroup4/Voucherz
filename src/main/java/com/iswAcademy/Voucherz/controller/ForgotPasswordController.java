@@ -2,32 +2,27 @@ package com.iswAcademy.Voucherz.controller;
 
 import com.iswAcademy.Voucherz.dao.IUserDao;
 import com.iswAcademy.Voucherz.domain.ForgotPassword;
-import com.iswAcademy.Voucherz.domain.PasswordReset;
 import com.iswAcademy.Voucherz.domain.PasswordResetToken;
 import com.iswAcademy.Voucherz.domain.User;
 import com.iswAcademy.Voucherz.mailservice.IMailService;
-import com.iswAcademy.Voucherz.controller.service.Response;
 import com.iswAcademy.Voucherz.mailservice.Mail;
 import com.iswAcademy.Voucherz.service.ITokenService;
 import com.iswAcademy.Voucherz.service.IUserService;
-import com.iswAcademy.Voucherz.util.ITokenGenerator;
 import com.iswAcademy.Voucherz.util.TokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
-@Controller
+//@Controller
+@RestController
 @RequestMapping(value = "/forgot-password")
 public class ForgotPasswordController {
 
@@ -56,7 +51,7 @@ public class ForgotPasswordController {
         return "forgot-password";
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = "/end", method = RequestMethod.POST)
     public String forgot(@ModelAttribute("forgotPasswordForm") @Valid ForgotPassword resetEmail,
                          BindingResult result, HttpServletRequest request) {
         if (result.hasErrors()){

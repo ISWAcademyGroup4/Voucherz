@@ -44,5 +44,6 @@ public class PasswordResetToken extends BaseEntity{
     public boolean isExpired() {
         return new Date().after(this.expiryDate);
     }
+
 }
 
