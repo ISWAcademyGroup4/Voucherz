@@ -66,7 +66,6 @@ public class AuthController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
-
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationRequest request){
         User user = new User();
@@ -83,6 +82,31 @@ public class AuthController {
         user.setPhoneNumber(request.getPhoneNumber());
         user.setCompanySize(request.getCompanySize());
         user.setRole(RoleName.ROLE_USER.toString());
+        User  result= userService.createUser(user);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/api/auth/{email}")
+                .buildAndExpand(result.getEmail()).toUri();
+        logger.info(String.format("Signup.registerUser(%s)", user));
+
+        return ResponseEntity.created(location).body(new Response("201", "created"));
+    }
+
+    @PostMapping("/admin")
+    public ResponseEntity<?> adminRegistration(@Valid @RequestBody UserRegistrationRequest request){
+        User user = new User();
+
+        if(userService.findUser(user.getEmail()) != null){
+            return new ResponseEntity(new Response("400", "Email Already in use"),
+                    HttpStatus.BAD_REQUEST);
+        }
+//Creating User's account
+        user.setFirstName(request.getFirstName());
+        user.setLastName(request.getLastName());
+        user.setPassword( passwordEncoder.encode(request.getPassword()));
+        user.setEmail(request.getEmail());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setCompanySize(request.getCompanySize());
+        user.setRole(RoleName.ROLE_ADMIN.toString());
         User  result= userService.createUser(user);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/auth/{email}")
@@ -115,7 +139,6 @@ public class AuthController {
             throw new UsernameNotFoundException("Invalid Email Address");
         }
         String token = UUID.randomUUID().toString();
-
         return null;
     }
 
