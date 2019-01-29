@@ -79,7 +79,7 @@ public class ResetPasswordController {
     }
 
 
-    @RequestMapping(value ="/point", method = RequestMethod.POST)
+    @RequestMapping(value ="/point", method = RequestMethod.PATCH)
     @Transactional
     public String reset2(@RequestParam("token") String token, @RequestBody @Valid final ApiPasswordReset resetrequest,
                         BindingResult result,
@@ -89,7 +89,9 @@ public class ResetPasswordController {
             redirectAttributes.addFlashAttribute("passwordResetForm", resetrequest);
             return "redirect:/reset-password?token=" + token;
         }
-
+        if(resetrequest.getPassword() != resetrequest.getConfirmPassword()) {
+            return "Password does not match! \n Please check password and try it!";
+        }
         User user = userService.findByToken(token);
         String updatedPassword = passwordEncoder.encode(resetrequest.getPassword());
         user.setPassword(updatedPassword);
