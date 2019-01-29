@@ -111,7 +111,7 @@ public class AuthController {
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/auth/{email}")
                 .buildAndExpand(result.getEmail()).toUri();
-        logger.info(String.format("Signup.registerUser(%s)", user));
+        logger.info(String.format("admin.registerUser(%s)", user));
 
         return ResponseEntity.created(location).body(new Response("201", "created"));
 
