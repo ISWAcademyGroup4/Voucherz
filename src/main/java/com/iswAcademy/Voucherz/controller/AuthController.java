@@ -1,5 +1,6 @@
 package com.iswAcademy.Voucherz.controller;
 
+import com.iswAcademy.Voucherz.audit.MessageSender;
 import com.iswAcademy.Voucherz.controller.service.JwtAuthenticationResponse;
 import com.iswAcademy.Voucherz.controller.model.LoginInRequest;
 import com.iswAcademy.Voucherz.controller.service.Response;
@@ -26,6 +27,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -49,6 +51,9 @@ public class AuthController {
 
     @Autowired
     JwtTokenProvider tokenProvider;
+
+    @Autowired
+    MessageSender messageSender;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginInRequest loginInRequest){
@@ -87,7 +92,8 @@ public class AuthController {
                 .fromCurrentContextPath().path("/api/auth/{email}")
                 .buildAndExpand(result.getEmail()).toUri();
         logger.info(String.format("Signup.registerUser(%s)", user));
-
+        String message = user.getFirstName() + " " + user.getLastName() + " with " + user.getEmail() + " was create at " + new Date() + ".";
+        messageSender.sendMessage(message);
         return ResponseEntity.created(location).body(new Response("201", "created"));
     }
 
@@ -114,7 +120,6 @@ public class AuthController {
         logger.info(String.format("admin.registerUser(%s)", user));
 
         return ResponseEntity.created(location).body(new Response("201", "created"));
-
     }
 
     @RequestMapping(value = "/update/{id}", method = RequestMethod.PATCH)

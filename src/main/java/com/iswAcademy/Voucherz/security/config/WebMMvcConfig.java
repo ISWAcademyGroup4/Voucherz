@@ -5,7 +5,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
-// this config allows for cross origin requests from react client
+// this Config allows for cross origin requests from react client
 @Configuration
 public class WebMMvcConfig implements WebMvcConfigurer {
     private final long MAX_AGE_SECS = 3600;
