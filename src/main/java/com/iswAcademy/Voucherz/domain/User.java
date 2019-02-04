@@ -1,9 +1,10 @@
 package com.iswAcademy.Voucherz.domain;
 
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class User extends BaseEntity{
+public class User extends BaseEntity implements Serializable {
 
     private  String FirstName;
 

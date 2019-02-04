@@ -1,5 +1,6 @@
 package com.iswAcademy.Voucherz.controller;
 
+import com.iswAcademy.Voucherz.audit.CustomMessage;
 import com.iswAcademy.Voucherz.audit.MessageSender;
 import com.iswAcademy.Voucherz.controller.service.JwtAuthenticationResponse;
 import com.iswAcademy.Voucherz.controller.model.LoginInRequest;
@@ -70,7 +71,15 @@ public class AuthController {
 
         String jwt = tokenProvider.generateToken(authentication);
         logger.info(String.format("signin.authenticateUser(%s)", jwt));
-        String message =  " User with email " + loginInRequest.getEmail() + " logged in on " + new Date() + ".";
+//        String message =  " User with email " + loginInRequest.getEmail() + " logged in on " + new Date() + ".";
+
+//        CustomMessage message = new CustomMessage("User with email Address " + loginInRequest.getEmail() + "logged in",
+//                "Logged in", LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
+        CustomMessage message = new CustomMessage();
+        message.setDescription("User with email Address " + loginInRequest.getEmail() + "logged in");
+        message.setRole("Role_User");
+        message.setEvent("logged into his Account");
+        message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
         messageSender.sendMessage(message);
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
@@ -98,7 +107,14 @@ public class AuthController {
                 .fromCurrentContextPath().path("/api/auth/{email}")
                 .buildAndExpand(result.getEmail()).toUri();
         logger.info(String.format("Signup.registerUser(%s)", user));
-        String message = user.getFirstName() + " " + user.getLastName() + " with email " + user.getEmail() + " was created on " + new Date() + ".";
+//        String message = user.getFirstName() + " " + user.getLastName() + " with email " + user.getEmail() + " was created on " + new Date() + ".";
+//        CustomMessage message = new CustomMessage("User with email Address " + user.getEmail() + "logged in",user.getRole().toString(),
+//                "Created Account", LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
+        CustomMessage message = new CustomMessage();
+        message.setDescription("User with email Address " + user.getEmail() + "logged in");
+        message.setRole(user.getRole());
+        message.setEvent("Created an Account");
+        message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
         messageSender.sendMessage(message);
         return ResponseEntity.created(location).body(new Response("201", "created"));
     }
@@ -126,7 +142,14 @@ public class AuthController {
                 .fromCurrentContextPath().path("/api/auth/{email}")
                 .buildAndExpand(result.getEmail()).toUri();
         logger.info(String.format("admin.registerUser(%s)", user));
-        String message = user.getFirstName() + " " + user.getLastName() + " with email " + user.getEmail() + " was created on " + new Date() + ".";
+//        String message = user.getFirstName() + " " + user.getLastName() + " with email " + user.getEmail() + " was created on " + new Date() + ".";
+//        CustomMessage message = new CustomMessage("User with email Address " + user.getEmail() + "logged in",
+//                "Created Account", user.getRole(), LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
+        CustomMessage message = new CustomMessage();
+        message.setDescription("User with email Address " + user.getEmail() + "logged in");
+        message.setRole(user.getRole());
+        message.setEvent("Created an Account");
+        message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
         messageSender.sendMessage(message);
         return ResponseEntity.created(location).body(new Response("201", "created"));
     }
@@ -142,7 +165,14 @@ public class AuthController {
         user.setPhoneNumber(request.getPhoneNumber());
         user.setCompanySize(request.getCompanySize());
         userService.updateUser(id,user);
-        String message = user.getFirstName() + " " + user.getLastName() + " with email " + user.getEmail() + " was updated on " + new Date() + ".";
+//        String message = user.getFirstName() + " " + user.getLastName() + " with email " + user.getEmail() + " was updated on " + new Date() + ".";
+//         CustomMessage message = new CustomMessage("User with email Address " + user.getEmail() + "logged in",user.getRole(),
+//                "Updated Account", LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
+        CustomMessage message = new CustomMessage();
+        message.setDescription("User with email Address " + user.getEmail() + "logged in");
+        message.setRole(user.getRole());
+        message.setEvent("Updated Account");
+        message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
         messageSender.sendMessage(message);
         return  new Response ("200", "Updated");
 
