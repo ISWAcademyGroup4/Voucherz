@@ -7,18 +7,23 @@ CREATE TABLE [dbo].[Users](
 	[PhoneNumber] [nvarchar](50) NOT NULL,
 	[CompanySize] [int] NOT NULL,
 	[Role] [nvarchar](10) NOT NULL,
- )
+	Active bit default 0 NOT NULL,
+	DateCreated DATETIME NOT NULL
+)
 
  GO
 
  CREATE PROCEDURE [dbo].[uspCreateUser2]
- @FirstName nVARCHAR(50),
- @LastName nVARCHAR(50),
- @Email nVARCHAR(50),
- @Password nVARCHAR(100),
+ @FirstName NVARCHAR(50),
+ @LastName NVARCHAR(50),
+ @Email NVARCHAR(50),
+ @Password NVARCHAR(100),
  @PhoneNumber VARCHAR(20),
  @CompanySize int,
- @Role nVarchar(10)
+ @Role NVarchar(10),
+ @Active bit,
+ @DateCreated DATETIME
+
  AS
  BEGIN TRANSACTION
  DECLARE @id int = NULL
@@ -27,6 +32,7 @@ CREATE TABLE [dbo].[Users](
 
  BEGIN
  	--select @RoleId = id from roles where name = 'USER_ROLE'
+ 	SET NOCOUNT ON
  	select @id = UserId from Users where email = @email
  	if (@id > 0)
  	begin
@@ -34,7 +40,7 @@ CREATE TABLE [dbo].[Users](
  	end
  	Else
  	begin
- 	insert into users(Firstname, LastName,phonenumber, Email,[Password], companysize, [role] ) Values (@firstname, @lastname,@phonenumber, @email,@Password, @companysize, @role)
+ 	insert into users(Firstname, LastName, phonenumber, Email, [Password], CompanySize, [Role], Active, DateCreated) Values (@Firstname, @Lastname,@Phonenumber, @Email,@Password, @Companysize, @Role, @Active, @DateCreated)
  	Select @UserId=SCOPE_IDENTITY()
  	--insert into User_role (Userid, Roleid) values (@UserId, @RoleId)
  	end

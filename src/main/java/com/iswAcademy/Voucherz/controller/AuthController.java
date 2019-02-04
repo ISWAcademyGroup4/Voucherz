@@ -27,6 +27,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.net.URI;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -68,6 +70,8 @@ public class AuthController {
 
         String jwt = tokenProvider.generateToken(authentication);
         logger.info(String.format("signin.authenticateUser(%s)", jwt));
+        String message =  " User with email " + loginInRequest.getEmail() + " logged in on " + new Date() + ".";
+        messageSender.sendMessage(message);
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
@@ -87,12 +91,14 @@ public class AuthController {
         user.setPhoneNumber(request.getPhoneNumber());
         user.setCompanySize(request.getCompanySize());
         user.setRole(RoleName.ROLE_USER.toString());
-        User  result= userService.createUser(user);
+        user.setActive(false);
+        user.setDateCreated(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
+        User result= userService.createUser(user);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/auth/{email}")
                 .buildAndExpand(result.getEmail()).toUri();
         logger.info(String.format("Signup.registerUser(%s)", user));
-        String message = user.getFirstName() + " " + user.getLastName() + " with " + user.getEmail() + " was create at " + new Date() + ".";
+        String message = user.getFirstName() + " " + user.getLastName() + " with email " + user.getEmail() + " was created on " + new Date() + ".";
         messageSender.sendMessage(message);
         return ResponseEntity.created(location).body(new Response("201", "created"));
     }
@@ -113,12 +119,15 @@ public class AuthController {
         user.setPhoneNumber(request.getPhoneNumber());
         user.setCompanySize(request.getCompanySize());
         user.setRole(RoleName.ROLE_ADMIN.toString());
-        User  result= userService.createUser(user);
+        user.setActive(false);
+        user.setDateCreated(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
+        User result= userService.createUser(user);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/auth/{email}")
                 .buildAndExpand(result.getEmail()).toUri();
         logger.info(String.format("admin.registerUser(%s)", user));
-
+        String message = user.getFirstName() + " " + user.getLastName() + " with email " + user.getEmail() + " was created on " + new Date() + ".";
+        messageSender.sendMessage(message);
         return ResponseEntity.created(location).body(new Response("201", "created"));
     }
 
@@ -133,6 +142,8 @@ public class AuthController {
         user.setPhoneNumber(request.getPhoneNumber());
         user.setCompanySize(request.getCompanySize());
         userService.updateUser(id,user);
+        String message = user.getFirstName() + " " + user.getLastName() + " with email " + user.getEmail() + " was updated on " + new Date() + ".";
+        messageSender.sendMessage(message);
         return  new Response ("200", "Updated");
 
     }

@@ -1,6 +1,8 @@
 package com.iswAcademy.Voucherz.domain;
 
 
+import java.time.LocalDateTime;
+
 public class User extends BaseEntity{
 
     private  String FirstName;
@@ -13,8 +15,11 @@ public class User extends BaseEntity{
 
     private String PhoneNumber;
 
-
     private int CompanySize;
+
+    private boolean Active;
+
+    private LocalDateTime DateCreated;
 
     private String Role;
 
@@ -73,4 +78,36 @@ public class User extends BaseEntity{
     public void setCompanySize(int companySize) {
         CompanySize = companySize;
     }
+
+    public boolean isActive() {
+        return Active;
+    }
+
+    public void setActive(boolean active) {
+        Active = active;
+    }
+
+    public LocalDateTime getDateCreated() {
+        return DateCreated;
+    }
+
+    public void setDateCreated(LocalDateTime dateCreated) {
+        DateCreated = dateCreated;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "FirstName='" + FirstName + '\'' +
+                ", LastName='" + LastName + '\'' +
+                ", Email='" + Email + '\'' +
+                ", Password='" + Password + '\'' +
+                ", PhoneNumber='" + PhoneNumber + '\'' +
+                ", CompanySize=" + CompanySize +
+                ", Active=" + Active +
+                ", DateCreated=" + DateCreated +
+                ", Role='" + Role + '\'' +
+                '}';
+    }
+
 }
