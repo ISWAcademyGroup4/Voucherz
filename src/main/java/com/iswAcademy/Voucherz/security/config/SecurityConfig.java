@@ -79,6 +79,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/img/**",
                         "/webjars/**")
                 .permitAll()
+                .antMatchers("/api/user/delete").access("hasRole('ROLE_ADMIN')")
                 .anyRequest()
                 .authenticated();
 

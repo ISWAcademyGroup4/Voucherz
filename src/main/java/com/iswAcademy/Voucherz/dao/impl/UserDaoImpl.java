@@ -3,6 +3,7 @@ package com.iswAcademy.Voucherz.dao.impl;
 import com.iswAcademy.Voucherz.dao.AbstractBaseDao;
 import com.iswAcademy.Voucherz.dao.IUserDao;
 import com.iswAcademy.Voucherz.dao.util.RowCountMapper;
+import com.iswAcademy.Voucherz.domain.Page;
 import com.iswAcademy.Voucherz.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -28,9 +29,9 @@ public class UserDaoImpl extends AbstractBaseDao<User> implements IUserDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         create = new SimpleJdbcCall(dataSource).withProcedureName("uspCreateUser2").withReturnValue();
         update = new SimpleJdbcCall(dataSource).withProcedureName("uspUserUpdate").withReturnValue();
+//        findAll = new SimpleJdbcCall(dataSource).withProcedureName("")
         updatePassword = new SimpleJdbcCall(dataSource).withProcedureName("uspUpdateUserPassword").withReturnValue();
         find = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUser").returningResultSet(SINGLE_RESULT,new BeanPropertyRowMapper<>(User.class));
-        findAll = new SimpleJdbcCall(dataSource).withProcedureName("uspFindAllUser").returningResultSet(RESULT_COUNT, new RowCountMapper()).returningResultSet(MULTIPLE_RESULT, new BeanPropertyRowMapper<>(User.class));
         findById = new SimpleJdbcCall(dataSource).withProcedureName("uspFindById").returningResultSet(SINGLE_RESULT, new BeanPropertyRowMapper<>(User.class));
         findUserByToken = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUserByToken3").returningResultSet(SINGLE_RESULT, new BeanPropertyRowMapper<>(User.class));
     }
@@ -68,5 +69,11 @@ public class UserDaoImpl extends AbstractBaseDao<User> implements IUserDao {
         }
         return list.get(0);
     }
+
+    @Override
+    public Page<User> findAll() {
+        return null;
+    }
+
 }
 

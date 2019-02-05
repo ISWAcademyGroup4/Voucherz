@@ -1,5 +1,7 @@
 package com.iswAcademy.Voucherz.controller;
 
+import com.iswAcademy.Voucherz.audit.CustomMessage;
+import com.iswAcademy.Voucherz.audit.MessageSender;
 import com.iswAcademy.Voucherz.dao.IUserDao;
 import com.iswAcademy.Voucherz.domain.ForgotPassword;
 import com.iswAcademy.Voucherz.domain.PasswordResetToken;
@@ -18,6 +20,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,6 +42,9 @@ public class ForgotPasswordController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    MessageSender messageSender;
 
     @Autowired
     IUserDao userDao;
@@ -79,6 +87,13 @@ public class ForgotPasswordController {
         model.put("resetUrl", url + "/reset-password?token=" + token.getToken());
         mail.setModel(model);
         mailService.sendEmail(mail);
+//        sending a message to the queue
+        CustomMessage message = new CustomMessage();
+        message.setDescription("User with email Address " + user.getEmail() + " logged in");
+        message.setRole(user.getRole());
+        message.setEvent("Forgot Password request");
+        message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
+        messageSender.sendMessage(message);
         return "redirect:/forgot-password?success";
     }
 

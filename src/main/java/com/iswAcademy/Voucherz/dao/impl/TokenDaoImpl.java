@@ -2,6 +2,7 @@ package com.iswAcademy.Voucherz.dao.impl;
 
 import com.iswAcademy.Voucherz.dao.AbstractBaseDao;
 import com.iswAcademy.Voucherz.dao.ITokenDao;
+import com.iswAcademy.Voucherz.domain.Page;
 import com.iswAcademy.Voucherz.domain.PasswordResetToken;
 import com.iswAcademy.Voucherz.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,11 @@ public class TokenDaoImpl extends AbstractBaseDao<PasswordResetToken> implements
 
     @Override
     public PasswordResetToken findById(long id) {
+        return null;
+    }
+
+    @Override
+    public Page<PasswordResetToken> findAll() {
         return null;
     }
 

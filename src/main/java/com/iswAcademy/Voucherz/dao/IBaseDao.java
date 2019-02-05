@@ -1,5 +1,7 @@
 package com.iswAcademy.Voucherz.dao;
 
+import com.iswAcademy.Voucherz.domain.Page;
+
 import java.util.List;
 
 public interface IBaseDao<T> {
@@ -11,12 +13,12 @@ public interface IBaseDao<T> {
 
     public T findById(long id);
 
-    public List<T> ReadAll();
+    public Page<T> findAll();
 
     public boolean delete(T model);
 
     public T findUserByToken(String token);
 
-    public boolean updatePassword(T model);
+    public boolean updatePassword(String email,T model);
 
 }

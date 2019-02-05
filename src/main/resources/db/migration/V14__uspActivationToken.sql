@@ -1,0 +1,5 @@
+CREATE TABLE ActivationToken (
+	ActId INT PRIMARY KEY IDENTITY(1,1) NOT NULL,
+	ActivationToken NVARCHAR(50) NOT NULL,
+	ExpiryDate DateTime NOT NULL
+)

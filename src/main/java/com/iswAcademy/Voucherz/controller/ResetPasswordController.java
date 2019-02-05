@@ -1,5 +1,7 @@
 package com.iswAcademy.Voucherz.controller;
 
+import com.iswAcademy.Voucherz.audit.CustomMessage;
+import com.iswAcademy.Voucherz.audit.MessageSender;
 import com.iswAcademy.Voucherz.dao.IUserDao;
 import com.iswAcademy.Voucherz.domain.ApiPasswordReset;
 import com.iswAcademy.Voucherz.domain.PasswordReset;
@@ -18,6 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 
 
 //@Controller
@@ -36,6 +41,9 @@ public class ResetPasswordController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    MessageSender messageSender;
 
     @Autowired
     IUserDao userDao;
@@ -89,13 +97,19 @@ public class ResetPasswordController {
             redirectAttributes.addFlashAttribute("passwordResetForm", resetrequest);
             return "redirect:/reset-password?token=" + token;
         }
-        if(resetrequest.getPassword() != resetrequest.getConfirmPassword()) {
-            return "Password does not match! \n Please check password and try it!";
-        }
+//        if(resetrequest.getPassword() != resetrequest.getConfirmPassword()) {
+//            return "Password does not match! \n Please check password and try again!";
+//        }
         User user = userService.findByToken(token);
         String updatedPassword = passwordEncoder.encode(resetrequest.getPassword());
         user.setPassword(updatedPassword);
-        userService.updatePassword(user);
+        userService.updatePassword(user.getEmail(),user);
+        CustomMessage message = new CustomMessage();
+        message.setDescription("User with email Address " + user.getEmail() + " logged in");
+        message.setRole(user.getRole());
+        message.setEvent("Requested to reset there password");
+        message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
+        messageSender.sendMessage(message);
         return "redirect:/api/auth/signin";
     }
 }

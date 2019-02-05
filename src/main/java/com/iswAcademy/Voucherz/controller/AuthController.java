@@ -7,11 +7,15 @@ import com.iswAcademy.Voucherz.controller.model.LoginInRequest;
 import com.iswAcademy.Voucherz.controller.service.Response;
 import com.iswAcademy.Voucherz.controller.model.UserRegistrationRequest;
 import com.iswAcademy.Voucherz.dao.IUserDao;
+import com.iswAcademy.Voucherz.domain.ActivationToken;
+import com.iswAcademy.Voucherz.mailservice.IMailService;
+import com.iswAcademy.Voucherz.mailservice.Mail;
 import com.iswAcademy.Voucherz.security.util.JwtTokenProvider;
 import com.iswAcademy.Voucherz.domain.RoleName;
 import com.iswAcademy.Voucherz.controller.model.UpdateUserRequest;
 import com.iswAcademy.Voucherz.domain.User;
 import com.iswAcademy.Voucherz.service.IUserService;
+import com.iswAcademy.Voucherz.util.TokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +35,8 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -48,6 +54,9 @@ public class AuthController {
 
     @Autowired
     IUserDao userDao;
+
+    @Autowired
+    private IMailService mailService;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -76,9 +85,9 @@ public class AuthController {
 //        CustomMessage message = new CustomMessage("User with email Address " + loginInRequest.getEmail() + "logged in",
 //                "Logged in", LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
         CustomMessage message = new CustomMessage();
-        message.setDescription("User with email Address " + loginInRequest.getEmail() + "logged in");
+        message.setDescription("User with email Address " + loginInRequest.getEmail() + " logged in.");
         message.setRole("Role_User");
-        message.setEvent("logged into his Account");
+        message.setEvent("logged into his account.");
         message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
         messageSender.sendMessage(message);
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
@@ -107,27 +116,25 @@ public class AuthController {
                 .fromCurrentContextPath().path("/api/auth/{email}")
                 .buildAndExpand(result.getEmail()).toUri();
         logger.info(String.format("Signup.registerUser(%s)", user));
-//        String message = user.getFirstName() + " " + user.getLastName() + " with email " + user.getEmail() + " was created on " + new Date() + ".";
-//        CustomMessage message = new CustomMessage("User with email Address " + user.getEmail() + "logged in",user.getRole().toString(),
-//                "Created Account", LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
+//        sending a message to the Rabbitmq queue
         CustomMessage message = new CustomMessage();
-        message.setDescription("User with email Address " + user.getEmail() + "logged in");
+        message.setDescription("User with email Address " + user.getEmail() + " logged in.");
         message.setRole(user.getRole());
-        message.setEvent("Created an Account");
+        message.setEvent("Created an Account.");
         message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
         messageSender.sendMessage(message);
         return ResponseEntity.created(location).body(new Response("201", "created"));
     }
 
     @PostMapping("/admin")
-    public ResponseEntity<?> adminRegistration(@Valid @RequestBody UserRegistrationRequest request){
+    public ResponseEntity<?> adminRegistration(@Valid @RequestBody UserRegistrationRequest request, HttpServletRequest httpServletRequest){
         User user = new User();
 
         if(userService.findUser(user.getEmail()) != null){
             return new ResponseEntity(new Response("400", "Email Already in use"),
                     HttpStatus.BAD_REQUEST);
         }
-//Creating User's account
+//Creating Admin's account
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setPassword( passwordEncoder.encode(request.getPassword()));
@@ -142,11 +149,23 @@ public class AuthController {
                 .fromCurrentContextPath().path("/api/auth/{email}")
                 .buildAndExpand(result.getEmail()).toUri();
         logger.info(String.format("admin.registerUser(%s)", user));
-//        String message = user.getFirstName() + " " + user.getLastName() + " with email " + user.getEmail() + " was created on " + new Date() + ".";
-//        CustomMessage message = new CustomMessage("User with email Address " + user.getEmail() + "logged in",
-//                "Created Account", user.getRole(), LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
+
+        ActivationToken activationToken = new ActivationToken();
+        activationToken.setToken(TokenGenerator.TokenGenerator());
+        Mail mail = new Mail();
+        mail.setFrom("Voucherz@gmail.com");
+        mail.setSubject("Click the link below to activate your account");
+        mail.setTo(user.getEmail());
+        Map<String, Object> model = new HashMap<>();
+        model.put("user", user);
+        model.put("signature", "https://Voucherzng.com");
+        String url = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName() + ":" + httpServletRequest.getServerPort();
+        model.put("resetUrl", url + "/reset-password?token=" + activationToken.getToken());
+        mail.setModel(model);
+        mailService.sendEmail(mail);
+//        sending a message to the queue
         CustomMessage message = new CustomMessage();
-        message.setDescription("User with email Address " + user.getEmail() + "logged in");
+        message.setDescription("User with email Address " + user.getEmail() + " logged in.");
         message.setRole(user.getRole());
         message.setEvent("Created an Account");
         message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
@@ -169,7 +188,7 @@ public class AuthController {
 //         CustomMessage message = new CustomMessage("User with email Address " + user.getEmail() + "logged in",user.getRole(),
 //                "Updated Account", LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
         CustomMessage message = new CustomMessage();
-        message.setDescription("User with email Address " + user.getEmail() + "logged in");
+        message.setDescription("User with email Address " + user.getEmail() + " logged in");
         message.setRole(user.getRole());
         message.setEvent("Updated Account");
         message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());

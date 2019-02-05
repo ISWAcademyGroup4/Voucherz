@@ -30,8 +30,8 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public boolean updatePassword(User user){
-        return userDao.updatePassword(user);
+    public boolean updatePassword(String email,User user){
+        return userDao.updatePassword(email,user);
     }
 
     @Override

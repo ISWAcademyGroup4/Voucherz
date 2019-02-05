@@ -1,6 +1,7 @@
 package com.iswAcademy.Voucherz.dao;
 
 import com.iswAcademy.Voucherz.domain.BaseEntity;
+import com.iswAcademy.Voucherz.domain.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -13,8 +14,9 @@ import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-public abstract class AbstractBaseDao <T extends BaseEntity> implements IBaseDao<T > {
+public abstract class AbstractBaseDao <T extends BaseEntity> implements IBaseDao<T> {
 
     protected JdbcTemplate jdbcTemplate;
     protected SimpleJdbcCall create, update, delete, find, findAll, findById,updatePassword, findUserEmailByToken, findUser,findUserByToken;
@@ -42,7 +44,7 @@ public abstract class AbstractBaseDao <T extends BaseEntity> implements IBaseDao
         return true;
     }
 
-    public boolean updatePassword(T model) {
+    public boolean updatePassword(String email,T model) {
         SqlParameterSource in = new BeanPropertySqlParameterSource(model);
         updatePassword.execute(in);
         return true;
@@ -62,10 +64,6 @@ public abstract class AbstractBaseDao <T extends BaseEntity> implements IBaseDao
         return list.get(0);
     }
 
-    public List<T> ReadAll() {
-        return null;
-    }
-
     public T findUserByToken(String token) {
         SqlParameterSource in = new MapSqlParameterSource().addValue("token",token);
         Map<String, Object> m = findUserByToken.execute(in);
@@ -76,5 +74,18 @@ public abstract class AbstractBaseDao <T extends BaseEntity> implements IBaseDao
         return list.get(0);
     }
 
+    public Page<T> findAll(int pageNumber, int pageSize) {
+        SqlParameterSource in = new MapSqlParameterSource().addValue("pageNumber", pageNumber).addValue("pageSize", pageSize);
+        Map<String, Object> m = findAll.execute(in);
+        List<T> content = (List<T>)m.get(MULTIPLE_RESULT);
+        List<Long> countList = (List<Long>)m.get(RESULT_COUNT);
+
+        long count = 0;
+        if (Objects.nonNull(countList) && !countList.isEmpty()) {
+            count = countList.get(0);
+        }
+        Page<T> page = new Page<>(count, content);
+        return page;
+    }
 
 }
