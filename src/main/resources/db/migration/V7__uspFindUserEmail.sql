@@ -9,5 +9,5 @@ BEGIN
 
     -- Insert statements for procedure here
 	SELECT Email FROM PasswordReset WHERE ResetToken = @token
-	--DELETE PasswordReset WHERE ResetToken = @token
+	--DELETE PasswordReset WHERE ResetToken = @activationToken
 END

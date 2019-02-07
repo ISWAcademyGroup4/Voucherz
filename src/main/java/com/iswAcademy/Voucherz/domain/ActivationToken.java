@@ -5,15 +5,16 @@ import java.util.Date;
 
 public class ActivationToken extends BaseEntity {
 
-    private String token;
+    private String activationToken;
     private Date expiryDate;
+    private String email;
 
-    public String getToken() {
-        return token;
+    public String getActivationToken() {
+        return activationToken;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setActivationToken(String activationToken) {
+        this.activationToken = activationToken;
     }
 
     public Date getExpiryDate() {
@@ -24,5 +25,13 @@ public class ActivationToken extends BaseEntity {
         Calendar now = Calendar.getInstance();
         now.add(Calendar.MINUTE, minutes);
         this.expiryDate = now.getTime();
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }

@@ -60,7 +60,7 @@ public class ForgotPasswordController {
     }
 
     @RequestMapping(value = "/end", method = RequestMethod.POST)
-    public String forgot(@ModelAttribute("forgotPasswordForm") @Valid ForgotPassword resetEmail,
+    public String forgot(@RequestBody @Valid ForgotPassword resetEmail,
                          BindingResult result, HttpServletRequest request) {
         if (result.hasErrors()){
             return "forgot-password";

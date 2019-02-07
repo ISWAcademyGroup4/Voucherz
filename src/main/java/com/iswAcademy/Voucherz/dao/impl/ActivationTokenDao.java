@@ -1,7 +1,8 @@
 package com.iswAcademy.Voucherz.dao.impl;
 
 import com.iswAcademy.Voucherz.dao.AbstractBaseDao;
-import com.iswAcademy.Voucherz.dao.ITokenDao;
+import com.iswAcademy.Voucherz.dao.IActivationTokenDao;
+import com.iswAcademy.Voucherz.domain.ActivationToken;
 import com.iswAcademy.Voucherz.domain.Page;
 import com.iswAcademy.Voucherz.domain.PasswordResetToken;
 import com.iswAcademy.Voucherz.domain.User;
@@ -19,44 +20,35 @@ import java.util.List;
 import java.util.Map;
 
 @Repository
-public class TokenDaoImpl extends AbstractBaseDao<PasswordResetToken> implements ITokenDao {
-
+public class ActivationTokenDao extends AbstractBaseDao<ActivationToken> implements IActivationTokenDao {
 
     @Autowired
     @Override
     public void setDataSource(@Qualifier(value="dataSource") DataSource dataSource){
         this.jdbcTemplate = new JdbcTemplate(dataSource);
-        create = new SimpleJdbcCall(dataSource).withProcedureName("uspTokenGen").withReturnValue();
+        create = new SimpleJdbcCall(dataSource).withProcedureName("uspCreateActivationToken").withReturnValue();
         update = new SimpleJdbcCall(dataSource).withProcedureName("uspUserUpdate").withReturnValue();
-        find = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUserByToken3").returningResultSet(SINGLE_RESULT,new BeanPropertyRowMapper<>(PasswordResetToken.class));
-        findUserEmailByToken = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUserEmail").returningResultSet(SINGLE_RESULT,new BeanPropertyRowMapper<>(User.class));
-        findUser = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUserByToken").returningResultSet(SINGLE_RESULT, new BeanPropertyRowMapper<>(PasswordResetToken.class));
+        find = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUserByToken3").returningResultSet(SINGLE_RESULT,new BeanPropertyRowMapper<>(ActivationToken.class));
     }
 
-
-
     @Override
-    public PasswordResetToken find(String token) {
+    public ActivationToken find(String token) {
         SqlParameterSource in = new MapSqlParameterSource().addValue("token", token);
         Map<String,Object> m = find.execute(in);
-        List<PasswordResetToken>list = (List<PasswordResetToken>) m.get(SINGLE_RESULT);
+        List<ActivationToken> list = (List<ActivationToken>) m.get(SINGLE_RESULT);
         if(list==null || list.isEmpty()){
             return null;
         }
         return list.get(0);
     }
 
-
-
     @Override
-    public PasswordResetToken findById(long id) {
+    public ActivationToken findById(long id) {
         return null;
     }
 
     @Override
-    public Page<PasswordResetToken> findAll() {
+    public Page<ActivationToken> findAll() {
         return null;
     }
-
-
 }

@@ -61,7 +61,7 @@ public class ResetPasswordController {
 //        } else if (passwordResetToken.isExpired()) {
 //            model.addAttribute("error", "Token has expired, please request a new password reset.");
 //        } else {
-//            model.addAttribute("token", passwordResetToken.getToken());
+//            model.addAttribute("token", passwordResetToken.getActivationToken());
 //        }
         return "reset-password";
     }
@@ -77,7 +77,7 @@ public class ResetPasswordController {
             return "redirect:/reset-password?token=" + resetrequest.getToken();
         }
 
-//        PasswordResetToken passwordResetToken = tokenService.findByToken(resetrequest.getToken());
+//        PasswordResetToken passwordResetToken = tokenService.findByToken(resetrequest.getActivationToken());
 //        User user = passwordResetToken.getUser();
 //        String updatePassword = passwordEncoder.encode(resetrequest.getPassword());
 //        userService.updatePassword(user.getId(),updatePassword);

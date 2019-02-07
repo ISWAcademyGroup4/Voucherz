@@ -9,5 +9,4 @@ BEGIN
 
     -- Insert statements for procedure here
 	SELECT [Firstname],[Lastname],[Email],[Password],[PhoneNumber],[CompanySize],[Role] FROM Users WHERE Email = (SELECT Email FROM PasswordReset WHERE ResetToken = @token)
-	--DELETE PasswordReset WHERE ResetToken = @token
 END

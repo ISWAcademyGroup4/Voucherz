@@ -14,6 +14,7 @@ import com.iswAcademy.Voucherz.security.util.JwtTokenProvider;
 import com.iswAcademy.Voucherz.domain.RoleName;
 import com.iswAcademy.Voucherz.controller.model.UpdateUserRequest;
 import com.iswAcademy.Voucherz.domain.User;
+import com.iswAcademy.Voucherz.service.IActivationTokenService;
 import com.iswAcademy.Voucherz.service.IUserService;
 import com.iswAcademy.Voucherz.util.TokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,8 +68,11 @@ public class AuthController {
     @Autowired
     MessageSender messageSender;
 
+    @Autowired
+    IActivationTokenService iActivationTokenService;
+
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginInRequest loginInRequest){
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginInRequest loginInRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginInRequest.getEmail(),
@@ -80,10 +84,6 @@ public class AuthController {
 
         String jwt = tokenProvider.generateToken(authentication);
         logger.info(String.format("signin.authenticateUser(%s)", jwt));
-//        String message =  " User with email " + loginInRequest.getEmail() + " logged in on " + new Date() + ".";
-
-//        CustomMessage message = new CustomMessage("User with email Address " + loginInRequest.getEmail() + "logged in",
-//                "Logged in", LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
         CustomMessage message = new CustomMessage();
         message.setDescription("User with email Address " + loginInRequest.getEmail() + " logged in.");
         message.setRole("Role_User");
@@ -94,82 +94,107 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationRequest request){
+    public ResponseEntity<?> signup(@Valid @RequestBody UserRegistrationRequest request, HttpServletRequest httpServletRequest) {
         User user = new User();
 
-        if(userService.findUser(user.getEmail()) != null){
+        if (userService.findUser(user.getEmail()) != null) {
             return new ResponseEntity(new Response("400", "Email Already in use"),
                     HttpStatus.BAD_REQUEST);
         }
-//Creating User's account
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
-        user.setPassword( passwordEncoder.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEmail(request.getEmail());
         user.setPhoneNumber(request.getPhoneNumber());
         user.setCompanySize(request.getCompanySize());
         user.setRole(RoleName.ROLE_USER.toString());
         user.setActive(false);
         user.setDateCreated(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
-        User result= userService.createUser(user);
+        User result = userService.createUser(user);
+
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/auth/{email}")
                 .buildAndExpand(result.getEmail()).toUri();
         logger.info(String.format("Signup.registerUser(%s)", user));
-//        sending a message to the Rabbitmq queue
+
+        //        sending a message to the Rabbitmq queue
         CustomMessage message = new CustomMessage();
         message.setDescription("User with email Address " + user.getEmail() + " logged in.");
         message.setRole(user.getRole());
         message.setEvent("Created an Account.");
         message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
         messageSender.sendMessage(message);
-        return ResponseEntity.created(location).body(new Response("201", "created"));
-    }
-
-    @PostMapping("/admin")
-    public ResponseEntity<?> adminRegistration(@Valid @RequestBody UserRegistrationRequest request, HttpServletRequest httpServletRequest){
-        User user = new User();
-
-        if(userService.findUser(user.getEmail()) != null){
-            return new ResponseEntity(new Response("400", "Email Already in use"),
-                    HttpStatus.BAD_REQUEST);
-        }
-//Creating Admin's account
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setPassword( passwordEncoder.encode(request.getPassword()));
-        user.setEmail(request.getEmail());
-        user.setPhoneNumber(request.getPhoneNumber());
-        user.setCompanySize(request.getCompanySize());
-        user.setRole(RoleName.ROLE_ADMIN.toString());
-        user.setActive(false);
-        user.setDateCreated(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
-        User result= userService.createUser(user);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentContextPath().path("/api/auth/{email}")
-                .buildAndExpand(result.getEmail()).toUri();
-        logger.info(String.format("admin.registerUser(%s)", user));
 
         ActivationToken activationToken = new ActivationToken();
-        activationToken.setToken(TokenGenerator.TokenGenerator());
+        activationToken.setActivationToken(TokenGenerator.TokenGenerator());
+        activationToken.setExpiryDate(30);
+        activationToken.setEmail(request.getEmail());
+        iActivationTokenService.createActivationToken(activationToken);
         Mail mail = new Mail();
         mail.setFrom("Voucherz@gmail.com");
         mail.setSubject("Click the link below to activate your account");
         mail.setTo(user.getEmail());
         Map<String, Object> model = new HashMap<>();
+        model.put("activationToken", activationToken);
         model.put("user", user);
         model.put("signature", "https://Voucherzng.com");
         String url = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName() + ":" + httpServletRequest.getServerPort();
-        model.put("resetUrl", url + "/reset-password?token=" + activationToken.getToken());
+        model.put("resetUrl", url + "/login?token=" + activationToken.getActivationToken());
         mail.setModel(model);
         mailService.sendEmail(mail);
-//        sending a message to the queue
+        return ResponseEntity.created(location).body(new Response("201", "created"));
+    }
+
+    @PostMapping("/admin")
+    public ResponseEntity<?> adminRegistration(@Valid @RequestBody UserRegistrationRequest request, HttpServletRequest httpServletRequest) {
+        User user = new User();
+
+        if (userService.findUser(user.getEmail()) != null) {
+            return new ResponseEntity(new Response("400", "Email Already in use"),
+                    HttpStatus.BAD_REQUEST);
+        }
+//Creating Admin's account
+        user.setFirstName(request.getFirstName().toUpperCase());
+        user.setLastName(request.getLastName().toUpperCase());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setEmail(request.getEmail().toLowerCase());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setCompanySize(request.getCompanySize());
+        user.setRole(RoleName.ROLE_ADMIN.toString());
+        user.setActive(false);
+        user.setDateCreated(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
+        User result = userService.createUser(user);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/api/auth/{email}")
+                .buildAndExpand(result.getEmail()).toUri();
+        logger.info(String.format("admin.registerUser(%s)", user));
+
+        //        sending a message to the queue
         CustomMessage message = new CustomMessage();
-        message.setDescription("User with email Address " + user.getEmail() + " logged in.");
+        message.setDescription("User with email Address " + user.getEmail() + " created an account.");
         message.setRole(user.getRole());
         message.setEvent("Created an Account");
         message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
         messageSender.sendMessage(message);
+
+//sending activation mail
+        ActivationToken activationToken = new ActivationToken();
+        activationToken.setActivationToken(TokenGenerator.TokenGenerator());
+        activationToken.setExpiryDate(30);
+        activationToken.setEmail(request.getEmail());
+        iActivationTokenService.createActivationToken(activationToken);
+        Mail mail = new Mail();
+        mail.setFrom("Voucherz@gmail.com");
+        mail.setSubject("Click the link below to activate your account");
+        mail.setTo(user.getEmail());
+        Map<String, Object> model = new HashMap<>();
+        model.put("activationToken", activationToken);
+        model.put("user", user);
+        model.put("signature", "https://Voucherzng.com");
+        String url = httpServletRequest.getScheme() + "://" + httpServletRequest.getServerName() + ":" + httpServletRequest.getServerPort();
+        model.put("resetUrl", url + "/login?token=" + activationToken.getActivationToken());
+        mail.setModel(model);
+        mailService.sendEmail(mail);
         return ResponseEntity.created(location).body(new Response("201", "created"));
     }
 
@@ -183,28 +208,32 @@ public class AuthController {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setPhoneNumber(request.getPhoneNumber());
         user.setCompanySize(request.getCompanySize());
-        userService.updateUser(id,user);
-//        String message = user.getFirstName() + " " + user.getLastName() + " with email " + user.getEmail() + " was updated on " + new Date() + ".";
-//         CustomMessage message = new CustomMessage("User with email Address " + user.getEmail() + "logged in",user.getRole(),
-//                "Updated Account", LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
+        userService.updateUser(id, user);
         CustomMessage message = new CustomMessage();
         message.setDescription("User with email Address " + user.getEmail() + " logged in");
         message.setRole(user.getRole());
         message.setEvent("Updated Account");
         message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
         messageSender.sendMessage(message);
-        return  new Response ("200", "Updated");
+        return new Response("200", "Updated");
 
     }
 
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
     public Response resetPassword(HttpServletRequest request, @RequestParam("email") String userEmail) {
         User user = userService.findUser(userEmail);
-        if(user == null) {
+        if (user == null) {
             throw new UsernameNotFoundException("Invalid Email Address");
         }
         String token = UUID.randomUUID().toString();
         return null;
+    }
+
+    @RequestMapping(value="/user/{id}", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Response findUser(@PathVariable("id") long id) {
+        User user = userService.findUserById(id);
+        return new Response("200", "ok", null);
     }
 
 }
