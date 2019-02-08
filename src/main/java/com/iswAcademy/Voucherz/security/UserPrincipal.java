@@ -18,21 +18,20 @@ public class UserPrincipal implements UserDetails {
 
     //this username will be the user email
     @JsonIgnore
-    private String Username;
+    private String username;
 
     @JsonIgnore
-    private String Password;
+    private String password;
 
-    private String Email;
+    private String email;
 
     private Collection<? extends GrantedAuthority> authorities;
 
     public UserPrincipal(Long id,  String username, String password, String email, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
-
-        Username = username;
-        Password = password;
-        Email = email;
+        this.username = username;
+        this.password = password;
+        this.email = email;
         this.authorities = authorities;
     }
 
@@ -61,17 +60,17 @@ public class UserPrincipal implements UserDetails {
     }
 
     public String getEmail() {
-        return Email;
+        return email;
     }
 
     @Override
     public String getUsername() {
-        return Username;
+        return username;
     }
 
     @Override
     public String getPassword() {
-        return Password;
+        return password;
     }
 
     @Override
@@ -113,13 +112,13 @@ public class UserPrincipal implements UserDetails {
         if (o == null || getClass() != o.getClass()) return false;
         UserPrincipal that = (UserPrincipal) o;
         return Objects.equals(id, that.id) &&
-                Objects.equals(Username, that.Username) &&
-                Objects.equals(Password, that.Password) &&
+                Objects.equals(username, that.username) &&
+                Objects.equals(password, that.password) &&
                 Objects.equals(authorities, that.authorities);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, Username, Password, authorities);
+        return Objects.hash(id, username, password, authorities);
     }
 }

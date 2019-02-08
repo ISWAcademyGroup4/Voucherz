@@ -1,6 +1,7 @@
 package com.iswAcademy.Voucherz.security.util;
 
 import com.iswAcademy.Voucherz.security.UserPrincipal;
+import com.sun.deploy.security.ValidationState;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,6 @@ public class JwtTokenProvider {
 
 
     public String generateToken(Authentication authentication){
-        //downcasted
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
 
         Date now = new Date();
@@ -33,12 +33,11 @@ public class JwtTokenProvider {
         Claims claims = Jwts.claims().setSubject(userPrincipal.getEmail());
 
         return Jwts.builder()
-                .setSubject(userPrincipal.getUsername())
-                .setSubject(Long.toString(userPrincipal.getId()))
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .signWith(SignatureAlgorithm.HS512,jwtSecret)
+                .setHeaderParam("typ","JWT")
                 .compact();
 
     }

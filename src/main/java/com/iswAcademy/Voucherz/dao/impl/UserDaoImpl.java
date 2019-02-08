@@ -18,22 +18,25 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Repository
 public class UserDaoImpl extends AbstractBaseDao<User> implements IUserDao {
     protected SimpleJdbcCall findByEmail;
+    protected SimpleJdbcCall isActive;
 
     @Autowired
     @Override
     public void setDataSource(@Qualifier(value="dataSource") DataSource dataSource){
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         create = new SimpleJdbcCall(dataSource).withProcedureName("uspCreateUser2").withReturnValue();
-        update = new SimpleJdbcCall(dataSource).withProcedureName("uspUserUpdate").withReturnValue();
-//        findAll = new SimpleJdbcCall(dataSource).withProcedureName("")
-        updatePassword = new SimpleJdbcCall(dataSource).withProcedureName("uspUpdateUserPassword").withReturnValue();
-        find = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUser").returningResultSet(SINGLE_RESULT,new BeanPropertyRowMapper<>(User.class));
-        findById = new SimpleJdbcCall(dataSource).withProcedureName("uspFindById").returningResultSet(SINGLE_RESULT, new BeanPropertyRowMapper<>(User.class));
-        findUserByToken = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUserByToken3").returningResultSet(SINGLE_RESULT, new BeanPropertyRowMapper<>(User.class));
+        update = new SimpleJdbcCall(jdbcTemplate).withProcedureName("uspUserUpdate").withReturnValue();
+        findAll = new SimpleJdbcCall(jdbcTemplate).withProcedureName("uspGetUsers").withReturnValue().returningResultSet(MULTIPLE_RESULT,new BeanPropertyRowMapper<>(User.class));
+        updatePassword = new SimpleJdbcCall(jdbcTemplate).withProcedureName("uspUpdateUserPassword").withReturnValue();
+        find = new SimpleJdbcCall(jdbcTemplate).withProcedureName("uspFindUser").returningResultSet(SINGLE_RESULT,new BeanPropertyRowMapper<>(User.class));
+        findById = new SimpleJdbcCall(jdbcTemplate).withProcedureName("uspFindById").returningResultSet(SINGLE_RESULT, new BeanPropertyRowMapper<>(User.class));
+        findUserByToken = new SimpleJdbcCall(jdbcTemplate).withProcedureName("uspFindUserByToken3").returningResultSet(SINGLE_RESULT, new BeanPropertyRowMapper<>(User.class));
+        isActive = new SimpleJdbcCall(jdbcTemplate).withProcedureName("uspIsActive").returningResultSet(SINGLE_RESULT, new BeanPropertyRowMapper<>(User.class));
     }
 
     @Override
@@ -47,6 +50,16 @@ public class UserDaoImpl extends AbstractBaseDao<User> implements IUserDao {
         return list.get(0);
     }
 
+    @Override
+    public Boolean isActive(boolean active, String email) {
+        SqlParameterSource in = new MapSqlParameterSource().addValue("active",active).addValue("email",email);
+        Map<String,Object> m = isActive.execute(in);
+        List<Boolean> list = (List<Boolean>) m.get(SINGLE_RESULT);
+        if(list == null || list.isEmpty()) {
+            return null;
+        }
+        return list.get(0);
+    }
 
     @Override
     public User find(String email) {
@@ -68,11 +81,6 @@ public class UserDaoImpl extends AbstractBaseDao<User> implements IUserDao {
             return null;
         }
         return list.get(0);
-    }
-
-    @Override
-    public Page<User> findAll() {
-        return null;
     }
 
 }

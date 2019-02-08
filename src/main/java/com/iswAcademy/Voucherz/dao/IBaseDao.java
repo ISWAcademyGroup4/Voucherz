@@ -13,7 +13,7 @@ public interface IBaseDao<T> {
 
     public T findById(long id);
 
-    public Page<T> findAll();
+    public List<T> findAll(String name);
 
     public boolean delete(T model);
 

@@ -53,10 +53,5 @@ public class TokenDaoImpl extends AbstractBaseDao<PasswordResetToken> implements
         return null;
     }
 
-    @Override
-    public Page<PasswordResetToken> findAll() {
-        return null;
-    }
-
 
 }

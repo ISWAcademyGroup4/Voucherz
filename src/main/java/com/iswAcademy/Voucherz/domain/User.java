@@ -1,25 +1,35 @@
 package com.iswAcademy.Voucherz.domain;
 
 
+import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 public class User extends BaseEntity implements Serializable {
 
+    @ApiModelProperty(notes = "User's Firstname")
     private  String FirstName;
 
+    @ApiModelProperty(notes = "User's Lastname")
     private String LastName;
 
+    @ApiModelProperty(notes = "User's email")
     private String Email;
 
+    @ApiModelProperty(notes = "User's password")
     private String Password;
 
+    @ApiModelProperty(notes="User's phoneNumber")
     private String PhoneNumber;
 
+    @ApiModelProperty(notes = "User's company size")
     private int CompanySize;
 
+    @ApiModelProperty(notes = "User's status")
     private boolean Active;
 
+    @ApiModelProperty(notes = "Date created")
     private LocalDateTime DateCreated;
 
     private String Role;

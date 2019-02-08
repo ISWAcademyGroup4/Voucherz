@@ -27,8 +27,8 @@ public class ActivationTokenDao extends AbstractBaseDao<ActivationToken> impleme
     public void setDataSource(@Qualifier(value="dataSource") DataSource dataSource){
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         create = new SimpleJdbcCall(dataSource).withProcedureName("uspCreateActivationToken").withReturnValue();
-        update = new SimpleJdbcCall(dataSource).withProcedureName("uspUserUpdate").withReturnValue();
-        find = new SimpleJdbcCall(dataSource).withProcedureName("uspFindUserByToken3").returningResultSet(SINGLE_RESULT,new BeanPropertyRowMapper<>(ActivationToken.class));
+        update = new SimpleJdbcCall(jdbcTemplate).withProcedureName("uspUserUpdate").withReturnValue();
+        find = new SimpleJdbcCall(jdbcTemplate).withProcedureName("uspFindUserByToken3").returningResultSet(SINGLE_RESULT,new BeanPropertyRowMapper<>(ActivationToken.class));
     }
 
     @Override
@@ -47,8 +47,4 @@ public class ActivationTokenDao extends AbstractBaseDao<ActivationToken> impleme
         return null;
     }
 
-    @Override
-    public Page<ActivationToken> findAll() {
-        return null;
-    }
 }

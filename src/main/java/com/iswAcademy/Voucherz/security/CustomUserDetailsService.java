@@ -18,24 +18,19 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String Email) throws UsernameNotFoundException {
-//        let people login with their detail username= email its a method in spring boot
-
         User user = userDao.findByEmail(Email);
         if (user == null){
-            throw new UsernameNotFoundException("Unregistered user:" + Email);
+            throw new UsernameNotFoundException("User not found with username or email:" + Email);
         }
         return UserPrincipal.create(user);
 
     }
 
-
-    //this method is used by jwtauthenticationfilter
-
     @Transactional
     public UserDetails loadUserById(Long id){
         User user = userDao.findById(id);
         if (user == null){
-            throw new UsernameNotFoundException("User not found id:" + id);
+            throw new UsernameNotFoundException("User not found with id:" + id);
         }
 
         return UserPrincipal.create(user);

@@ -7,6 +7,9 @@ import com.iswAcademy.Voucherz.exception.RequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements IUserService {
     @Autowired
@@ -35,9 +38,15 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public List<User> findAll(String name) {
+        return userDao.findAll(name);
+    }
+
+    @Override
     public User findUserById(long id) {
         return userDao.findById(id);
     }
+
     @Override
     public User findUser(String Email) {
         return userDao.find(Email);
@@ -45,6 +54,11 @@ public class UserServiceImpl implements IUserService {
 
     public User findByToken(String token) {
         return userDao.findUserByToken(token);
+    }
+
+    public boolean isActive(boolean active, String email ) {
+        userDao.isActive(active, email);
+        return true;
     }
 
 }

@@ -42,7 +42,7 @@ public class UserController {
     @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.OK)
     public Response updateUser(@PathVariable("id") long id, @RequestBody @Validated final UpdateUserRequest request) {
-        User user = new User();
+        User user = userService.findUserById(id);
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
         user.setEmail(request.getEmail());
@@ -61,24 +61,5 @@ public class UserController {
         userService.findUser(email);
         return new Response ("200", "found");
     }
-
-
-
-
-
-//    @PostMapping("/login")
-//    public Response login(@Validated LoginInRequest request){
-//        Response response = null;
-//        User user = new User();
-//        user.setEmail(request.getEmail());
-//        user.setPhoneNumber(request.getPassword());
-//        return  new Response ("200" , "You are Logged in");
-//    }
-
-
-
-
-
-
 
 }

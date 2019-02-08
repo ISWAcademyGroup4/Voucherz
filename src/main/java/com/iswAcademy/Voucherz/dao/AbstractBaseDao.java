@@ -74,18 +74,15 @@ public abstract class AbstractBaseDao <T extends BaseEntity> implements IBaseDao
         return list.get(0);
     }
 
-    public Page<T> findAll(int pageNumber, int pageSize) {
-        SqlParameterSource in = new MapSqlParameterSource().addValue("pageNumber", pageNumber).addValue("pageSize", pageSize);
+    public List<T> findAll(String name) {
+        SqlParameterSource in = new MapSqlParameterSource().addValue("name", name);
         Map<String, Object> m = findAll.execute(in);
-        List<T> content = (List<T>)m.get(MULTIPLE_RESULT);
-        List<Long> countList = (List<Long>)m.get(RESULT_COUNT);
-
-        long count = 0;
-        if (Objects.nonNull(countList) && !countList.isEmpty()) {
-            count = countList.get(0);
+        List<T> list = (List<T>) m.get(MULTIPLE_RESULT);
+        if(list == null || list.isEmpty()) {
+        return null;
         }
-        Page<T> page = new Page<>(count, content);
-        return page;
+        return list;
     }
+
 
 }

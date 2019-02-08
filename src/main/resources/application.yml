@@ -1,0 +1,12 @@
+eureka:
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://172.20.20.23:8070/eureka/
+    instance:
+      hostname: eurekaserver
+
+spring:
+  application:
+    name: userservice

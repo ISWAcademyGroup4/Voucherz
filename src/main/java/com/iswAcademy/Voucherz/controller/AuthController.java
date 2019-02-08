@@ -17,6 +17,10 @@ import com.iswAcademy.Voucherz.domain.User;
 import com.iswAcademy.Voucherz.service.IActivationTokenService;
 import com.iswAcademy.Voucherz.service.IUserService;
 import com.iswAcademy.Voucherz.util.TokenGenerator;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,14 +39,12 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Logger;
 
+@Api(value = "User Authentication Resource")
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 public class AuthController {
 
     protected Logger logger = Logger.getLogger(AuthController.class.getName());
@@ -71,8 +73,12 @@ public class AuthController {
     @Autowired
     IActivationTokenService iActivationTokenService;
 
+    @ApiOperation(value = "Returns JWT Token to an authenticated user")
+    @ApiResponses(
+            value={ @ApiResponse(code=201, message = "Created")}
+    )
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginInRequest loginInRequest) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginInRequest loginInRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginInRequest.getEmail(),
@@ -92,7 +98,7 @@ public class AuthController {
         messageSender.sendMessage(message);
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
-
+    @ApiOperation(value = "Users can signup via this endpoint")
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody UserRegistrationRequest request, HttpServletRequest httpServletRequest) {
         User user = new User();
@@ -145,8 +151,9 @@ public class AuthController {
         return ResponseEntity.created(location).body(new Response("201", "created"));
     }
 
+    @ApiOperation(value = "Admin sign up endpoint")
     @PostMapping("/admin")
-    public ResponseEntity<?> adminRegistration(@Valid @RequestBody UserRegistrationRequest request, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<?> adminsignup(@Valid @RequestBody UserRegistrationRequest request, HttpServletRequest httpServletRequest) {
         User user = new User();
 
         if (userService.findUser(user.getEmail()) != null) {
@@ -198,6 +205,7 @@ public class AuthController {
         return ResponseEntity.created(location).body(new Response("201", "created"));
     }
 
+    @ApiOperation(value = "Users can update there info via this endpoint")
     @RequestMapping(value = "/update/{id}", method = RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Response updateUser(@PathVariable("id") long id, @RequestBody @Validated final UpdateUserRequest request) {
@@ -219,21 +227,38 @@ public class AuthController {
 
     }
 
-    @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
-    public Response resetPassword(HttpServletRequest request, @RequestParam("email") String userEmail) {
-        User user = userService.findUser(userEmail);
-        if (user == null) {
-            throw new UsernameNotFoundException("Invalid Email Address");
-        }
-        String token = UUID.randomUUID().toString();
-        return null;
-    }
+//    @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
+//    public Response resetPassword(HttpServletRequest request, @RequestParam("email") String userEmail) {
+//        User user = userService.findUser(userEmail);
+//        if (user == null) {
+//            throw new UsernameNotFoundException("Invalid Email Address");
+//        }
+//        String token = UUID.randomUUID().toString();
+//        return null;
+//    }
 
+    @ApiOperation(value = "Returns a single user by id")
     @RequestMapping(value="/user/{id}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Response findUser(@PathVariable("id") long id) {
+    public User findUser(@PathVariable("id") long id) {
         User user = userService.findUserById(id);
-        return new Response("200", "ok", null);
+        return user;
+    }
+
+    @ApiOperation(value = "Returns a list of all users")
+    @RequestMapping(value="/users", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public List<User> findAll(@RequestParam(value="name") String name) {
+        List<User> list = userService.findAll(name);
+        return list;
+    }
+
+    @RequestMapping(value="/activate", method = RequestMethod.PATCH)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public boolean activate(@RequestParam(value = "active") boolean active, @RequestParam(value="email") String email) {
+        User user = userService.findUser(email);
+        user.setActive(active);
+        return true;
     }
 
 }
