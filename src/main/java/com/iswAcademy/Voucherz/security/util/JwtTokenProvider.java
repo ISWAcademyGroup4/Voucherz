@@ -17,8 +17,8 @@ public class JwtTokenProvider {
 
     private final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
-    @Value("${app.jwtSecret}")
-    private String jwtSecret;
+//    @Value("${app.jwtSecret}")
+//    private String jwtSecret;
 
     @Value("${app.jwtExpirationInMs}")
     private int jwtExpirationInMs;
@@ -36,7 +36,7 @@ public class JwtTokenProvider {
                 .setClaims(claims)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512,jwtSecret)
+                .signWith(SignatureAlgorithm.HS512,"JWTSuperSecretKey")
                 .setHeaderParam("typ","JWT")
                 .compact();
 
@@ -44,7 +44,7 @@ public class JwtTokenProvider {
 
     public Long getUserIdFromJWT(String token){
         Claims claims = Jwts.parser()
-                .setSigningKey(jwtSecret)
+                .setSigningKey("JWTSuperSecretKey")
                 .parseClaimsJws(token)
                 .getBody();
 
@@ -53,7 +53,7 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String authToken){
         try{
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+            Jwts.parser().setSigningKey("JWTSuperSecretKey").parseClaimsJws(authToken);
             return true;
         }catch(SignatureException ex){
             logger.error("Invalid JWT signature");

@@ -80,7 +80,7 @@ public class AuthControllerTest {
         user.setDateCreated(LocalDateTime.MAX);
         user.setRole(RoleName.ROLE_USER.toString());
 
-//        when(userService.findAll("name")).thenReturn(Arrays.asList(user, user2));
+//        when(userService.findAll("name")).thenReturn(Arrays.asList(user,user2));
     }
 
     @Test
