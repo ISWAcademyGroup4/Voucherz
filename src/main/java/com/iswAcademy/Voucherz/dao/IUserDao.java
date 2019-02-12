@@ -4,5 +4,6 @@ import com.iswAcademy.Voucherz.domain.User;
 
 public interface IUserDao extends IBaseDao<User> {
     User findByEmail(String Email);
-    Boolean isActive(boolean active, String email);
+    boolean isActive( User user, String email);
+    boolean updateRole(User user, String email);
 }

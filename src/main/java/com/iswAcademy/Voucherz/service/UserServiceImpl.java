@@ -24,11 +24,11 @@ public class UserServiceImpl implements IUserService {
         return null;
     }
     @Override
-    public boolean updateUser(Long id, User user){
-        User existingUser = userDao.findById(id);
+    public boolean updateUser(String email, User user){
+        User existingUser = userDao.findByEmail(email);
         if(existingUser == null)
             throw new RequestException("User not found");
-        user.setId(id);
+        user.setEmail(email);
         return userDao.update(user);
     }
 
@@ -56,8 +56,13 @@ public class UserServiceImpl implements IUserService {
         return userDao.findUserByToken(token);
     }
 
-    public boolean isActive(boolean active, String email ) {
-        userDao.isActive(active, email);
+    public boolean isActive(User user, String email ) {
+        userDao.isActive(user, email);
+        return true;
+    }
+
+    public boolean updateRole(User user, String email) {
+        userDao.updateRole(user, email);
         return true;
     }
 

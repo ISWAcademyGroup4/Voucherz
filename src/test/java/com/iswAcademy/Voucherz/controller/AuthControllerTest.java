@@ -3,6 +3,7 @@ package com.iswAcademy.Voucherz.controller;
 import com.iswAcademy.Voucherz.domain.RoleName;
 import com.iswAcademy.Voucherz.domain.User;
 import com.iswAcademy.Voucherz.service.IUserService;
+import com.iswAcademy.Voucherz.util.TimeFormat;
 import org.assertj.core.util.Arrays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -66,7 +67,7 @@ public class AuthControllerTest {
         user.setPhoneNumber("80994463545");
         user.setCompanySize(200);
         user.setActive(false);
-        user.setDateCreated(LocalDateTime.MAX);
+        user.setDateCreated(TimeFormat.newtime());
         user.setRole(RoleName.ROLE_USER.toString());
 
         User user2 = new User();
@@ -77,7 +78,7 @@ public class AuthControllerTest {
         user.setPhoneNumber("80994463545");
         user.setCompanySize(200);
         user.setActive(false);
-        user.setDateCreated(LocalDateTime.MAX);
+        user.setDateCreated(TimeFormat.newtime());
         user.setRole(RoleName.ROLE_USER.toString());
 
 //        when(userService.findAll("name")).thenReturn(Arrays.asList(user,user2));

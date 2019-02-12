@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 public class CustomMessage implements Serializable {
 
     private String description;
+    private String email;
     private String role;
     private String event;
     private String eventdate;
@@ -45,13 +46,22 @@ public class CustomMessage implements Serializable {
         return eventdate;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
     @Override
     public String toString() {
         return "CustomMessage{" +
                 "description='" + description + '\'' +
+                ", email='" + email + '\'' +
                 ", role='" + role + '\'' +
                 ", event='" + event + '\'' +
-                ", eventdate=" + eventdate +
+                ", eventdate='" + eventdate + '\'' +
                 '}';
     }
 }

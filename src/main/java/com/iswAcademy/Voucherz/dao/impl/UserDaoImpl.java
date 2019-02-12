@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Repository;
 
 
 import javax.sql.DataSource;
+import java.sql.Types;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,6 +26,7 @@ import java.util.Objects;
 public class UserDaoImpl extends AbstractBaseDao<User> implements IUserDao {
     protected SimpleJdbcCall findByEmail;
     protected SimpleJdbcCall isActive;
+    protected SimpleJdbcCall updateRole;
 
     @Autowired
     @Override
@@ -37,6 +40,7 @@ public class UserDaoImpl extends AbstractBaseDao<User> implements IUserDao {
         findById = new SimpleJdbcCall(jdbcTemplate).withProcedureName("uspFindById").returningResultSet(SINGLE_RESULT, new BeanPropertyRowMapper<>(User.class));
         findUserByToken = new SimpleJdbcCall(jdbcTemplate).withProcedureName("uspFindUserByToken3").returningResultSet(SINGLE_RESULT, new BeanPropertyRowMapper<>(User.class));
         isActive = new SimpleJdbcCall(jdbcTemplate).withProcedureName("uspIsActive").returningResultSet(SINGLE_RESULT, new BeanPropertyRowMapper<>(User.class));
+        updateRole = new SimpleJdbcCall(jdbcTemplate).withProcedureName("uspUpdateUserRole").returningResultSet(SINGLE_RESULT, new BeanPropertyRowMapper<>(User.class));
     }
 
     @Override
@@ -49,16 +53,32 @@ public class UserDaoImpl extends AbstractBaseDao<User> implements IUserDao {
         }
         return list.get(0);
     }
+//
+//    @Override
+//    public User isActive(User user, String email) {
+//        SqlParameterSource in = new MapSqlParameterSource().addValue("email",email);
+//        Map<String,Object> m = isActive.execute(in);
+//        List<User> list = (List<User>) m.get(SINGLE_RESULT);
+//        if(list == null || list.isEmpty()) {
+//            return null;
+//        }
+//        return list.get(0);
+//    }
 
-    @Override
-    public Boolean isActive(boolean active, String email) {
-        SqlParameterSource in = new MapSqlParameterSource().addValue("active",active).addValue("email",email);
-        Map<String,Object> m = isActive.execute(in);
-        List<Boolean> list = (List<Boolean>) m.get(SINGLE_RESULT);
-        if(list == null || list.isEmpty()) {
-            return null;
-        }
-        return list.get(0);
+    public boolean isActive(User user, String email) {
+        SqlParameterSource in = new MapSqlParameterSource()
+                .addValue("active", user.isActive() ? 1 : 0, Types.BIT)
+                .addValue("email", user.getEmail(),Types.NVARCHAR);
+        isActive.execute(in);
+        return true;
+    }
+
+    public boolean updateRole(User user, String email) {
+        SqlParameterSource in = new MapSqlParameterSource()
+                .addValue("role", user.getRole(), Types.NVARCHAR)
+                .addValue("email", user.getEmail(),Types.NVARCHAR);
+        isActive.execute(in);
+        return true;
     }
 
     @Override

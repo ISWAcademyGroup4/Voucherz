@@ -78,7 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/auth/signin" ,"/auth/admin","/auth/signup", "/auth**","/forgot-password**","/reset-password**","/forgot-password/end**","/reset-password/point**","/auth/user/{id}", "/auth/users", "/auth/events")
+                .antMatchers("/auth/signin" ,"/auth/admin","/auth/signup", "/auth**","/forgot-password**","/reset-password**","/forgot-password/end**","/reset-password/point**","/auth/user/{id}", "/auth/users", "/auth/events","/auth/activate/{active}","/auth/update/{email}")
                 .permitAll()
                 .antMatchers("/js/**",
                         "/css/**",
@@ -88,8 +88,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/user/delete").access("hasRole('ROLE_ADMIN')")
                 .anyRequest()
                 .authenticated();
-
-        //add our custom JWT security filter
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 

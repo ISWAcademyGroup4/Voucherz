@@ -16,6 +16,7 @@ import com.iswAcademy.Voucherz.controller.model.UpdateUserRequest;
 import com.iswAcademy.Voucherz.domain.User;
 import com.iswAcademy.Voucherz.service.IActivationTokenService;
 import com.iswAcademy.Voucherz.service.IUserService;
+import com.iswAcademy.Voucherz.util.TimeFormat;
 import com.iswAcademy.Voucherz.util.TokenGenerator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,7 +29,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +36,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.xml.bind.NotIdentifiableEvent;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -91,13 +92,24 @@ public class AuthController {
         String jwt = tokenProvider.generateToken(authentication);
         logger.info(String.format("signin.authenticateUser(%s)", jwt));
         CustomMessage message = new CustomMessage();
-        message.setDescription("User with email Address " + loginInRequest.getEmail() + " logged in.");
+        message.setDescription("User with email Address " + loginInRequest.getEmail() + " logged in .");
         message.setRole("Role_User");
         message.setEvent("logged into his account.");
-        message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
+        message.setEmail(loginInRequest.getEmail());
+        message.setEventdate(TimeFormat.newtime());
         messageSender.sendMessage(message);
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
+
+        User user = userService.findUser(loginInRequest.getEmail());
+
+//        return ResponseEntity.ok(new JwtAuthenticationResponse(
+//                jwt,
+//                loginInRequest.getEmail(),
+//                user.getRole(),
+//                user.getFirstName(),
+//                user.getLastName()));
+        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, user.isActive()));
     }
+
     @ApiOperation(value = "Users can signup via this endpoint")
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody UserRegistrationRequest request, HttpServletRequest httpServletRequest) {
@@ -107,30 +119,30 @@ public class AuthController {
             return new ResponseEntity(new Response("400", "Email Already in use"),
                     HttpStatus.BAD_REQUEST);
         }
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
+        user.setFirstName(request.getFirstName().toUpperCase());
+        user.setLastName(request.getLastName().toUpperCase());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setEmail(request.getEmail());
+        user.setEmail(request.getEmail().toLowerCase());
         user.setPhoneNumber(request.getPhoneNumber());
         user.setCompanySize(request.getCompanySize());
         user.setRole(RoleName.ROLE_USER.toString());
         user.setActive(false);
-        user.setDateCreated(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
+        user.setDateCreated(TimeFormat.newtime());
         User result = userService.createUser(user);
 
         URI location = ServletUriComponentsBuilder
-                .fromCurrentContextPath().path("/api/auth/{email}")
+                .fromCurrentContextPath().path("/auth/{email}")
                 .buildAndExpand(result.getEmail()).toUri();
-        logger.info(String.format("Signup.registerUser(%s)", user));
+        logger.info(String.format("Signup.signup(%s)", user));
 
         //        sending a message to the Rabbitmq queue
         CustomMessage message = new CustomMessage();
-        message.setDescription("User with email Address " + user.getEmail() + " logged in.");
+        message.setDescription("User with email Address " + user.getEmail() + " Signed up.");
         message.setRole(user.getRole());
         message.setEvent("Created an Account.");
-        message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
+        message.setEmail(user.getEmail());
+        message.setEventdate(TimeFormat.newtime());
         messageSender.sendMessage(message);
-
         ActivationToken activationToken = new ActivationToken();
         activationToken.setActivationToken(TokenGenerator.TokenGenerator());
         activationToken.setExpiryDate(30);
@@ -168,8 +180,8 @@ public class AuthController {
         user.setPhoneNumber(request.getPhoneNumber());
         user.setCompanySize(request.getCompanySize());
         user.setRole(RoleName.ROLE_ADMIN.toString());
-        user.setActive(false);
-        user.setDateCreated(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()));
+        user.setActive(true);
+        user.setDateCreated(TimeFormat.newtime());
         User result = userService.createUser(user);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/api/auth/{email}")
@@ -181,7 +193,8 @@ public class AuthController {
         message.setDescription("User with email Address " + user.getEmail() + " created an account.");
         message.setRole(user.getRole());
         message.setEvent("Created an Account");
-        message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
+        message.setEmail(user.getEmail());
+        message.setEventdate(TimeFormat.newtime());
         messageSender.sendMessage(message);
 
 //sending activation mail
@@ -206,22 +219,21 @@ public class AuthController {
     }
 
     @ApiOperation(value = "Users can update there info via this endpoint")
-    @RequestMapping(value = "/update/{id}", method = RequestMethod.PATCH)
+    @RequestMapping(value = "/update/{email}", method = RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Response updateUser(@PathVariable("id") long id, @RequestBody @Validated final UpdateUserRequest request) {
-        User user = userDao.findById(id);
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+    public Response updateUser(@PathVariable("email") String email, @RequestBody @Validated final UpdateUserRequest request) {
+        User user = userDao.findByEmail(email);
+        user.setFirstName(request.getFirstName().toUpperCase());
+        user.setLastName(request.getLastName().toUpperCase());
         user.setPhoneNumber(request.getPhoneNumber());
         user.setCompanySize(request.getCompanySize());
-        userService.updateUser(id, user);
+        userService.updateUser(email, user);
         CustomMessage message = new CustomMessage();
         message.setDescription("User with email Address " + user.getEmail() + " logged in");
         message.setRole(user.getRole());
         message.setEvent("Updated Account");
-        message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
+        message.setEmail(user.getEmail());
+        message.setEventdate(TimeFormat.newtime());
         messageSender.sendMessage(message);
         return new Response("200", "Updated");
 
@@ -253,12 +265,25 @@ public class AuthController {
         return list;
     }
 
-    @RequestMapping(value="/activate", method = RequestMethod.PATCH)
+    @CrossOrigin()
+    @ApiOperation(value = "Allows for deactivation and activation of a user")
+    @RequestMapping(value="/status", method = RequestMethod.PATCH)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public boolean activate(@RequestParam(value = "active") boolean active, @RequestParam(value="email") String email) {
+    public Response activate(@RequestParam(value = "active") boolean active, @RequestParam(value="email") String email) {
         User user = userService.findUser(email);
         user.setActive(active);
-        return true;
+        userService.isActive(user, email);
+        return new Response("202", "Accepted", null);
     }
 
+    @CrossOrigin()
+    @ApiOperation(value = "Allows for deactivation and activation of a user")
+    @RequestMapping(value="/updaterole", method = RequestMethod.PATCH)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Response updateRole(@RequestParam(value = "role") String role, @RequestParam(value="email") String email) {
+        User user = userService.findUser(email);
+        user.setRole(role);
+        userService.updateRole(user, email);
+        return new Response("202", "Accepted", null);
+    }
 }

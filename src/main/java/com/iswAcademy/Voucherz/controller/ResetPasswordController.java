@@ -10,6 +10,7 @@ import com.iswAcademy.Voucherz.domain.User;
 import com.iswAcademy.Voucherz.mailservice.IMailService;
 import com.iswAcademy.Voucherz.service.ITokenService;
 import com.iswAcademy.Voucherz.service.IUserService;
+import com.iswAcademy.Voucherz.util.TimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -108,7 +109,7 @@ public class ResetPasswordController {
         message.setDescription("User with email Address " + user.getEmail() + " logged in");
         message.setRole(user.getRole());
         message.setEvent("Requested to reset there password");
-        message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
+        message.setEventdate(TimeFormat.newtime());
         messageSender.sendMessage(message);
         return "redirect:/api/auth/signin";
     }

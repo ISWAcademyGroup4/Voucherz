@@ -39,20 +39,21 @@ public class UserController {
     }
 
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
-    @ResponseStatus(HttpStatus.OK)
-    public Response updateUser(@PathVariable("id") long id, @RequestBody @Validated final UpdateUserRequest request) {
-        User user = userService.findUserById(id);
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
-        user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword());
-        user.setPhoneNumber(request.getPhoneNumber());
-        user.setCompanySize(request.getCompanySize());
-        userService.updateUser(id,user);
-        return  new Response ("200", "Updated");
-
-    }
+//    @RequestMapping(value = "/{email}", method = RequestMethod.PATCH)
+//    @ResponseStatus(HttpStatus.OK)
+//    public Response updateUser(@PathVariable("email") String email, @RequestBody @Validated final UpdateUserRequest request) {
+////        User user = userService.findUserById(id);
+//        User user = userService.updateUser(email, user)
+//        user.setFirstName(request.getFirstName());
+//        user.setLastName(request.getLastName());
+//        user.setEmail(request.getEmail());
+//        user.setPassword(request.getPassword());
+//        user.setPhoneNumber(request.getPhoneNumber());
+//        user.setCompanySize(request.getCompanySize());
+//        userService.updateUser(email,user);
+//        return  new Response ("200", "Updated");
+//
+//    }
 
     @RequestMapping(value = "/{email}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.FOUND)

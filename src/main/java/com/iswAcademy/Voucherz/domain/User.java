@@ -30,7 +30,7 @@ public class User extends BaseEntity implements Serializable {
     private boolean Active;
 
     @ApiModelProperty(notes = "Date created")
-    private LocalDateTime DateCreated;
+    private String DateCreated;
 
     private String Role;
 
@@ -98,11 +98,11 @@ public class User extends BaseEntity implements Serializable {
         Active = active;
     }
 
-    public LocalDateTime getDateCreated() {
+    public String getDateCreated() {
         return DateCreated;
     }
 
-    public void setDateCreated(LocalDateTime dateCreated) {
+    public void setDateCreated(String dateCreated) {
         DateCreated = dateCreated;
     }
 

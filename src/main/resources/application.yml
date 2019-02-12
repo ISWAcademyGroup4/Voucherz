@@ -3,7 +3,7 @@ eureka:
     registerWithEureka: true
     fetchRegistry: true
     serviceUrl:
-      defaultZone: http://172.20.20.23:8070/eureka/
+      defaultZone: http://192.168.43.184:8070/eureka/
     instance:
       hostname: eurekaserver
 

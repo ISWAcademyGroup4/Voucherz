@@ -17,8 +17,8 @@ public class JwtTokenProvider {
 
     private final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
-//    @Value("${app.jwtSecret}")
-//    private String jwtSecret;
+    @Value("${app.jwtSecret}")
+    private String jwtSecret;
 
     @Value("${app.jwtExpirationInMs}")
     private int jwtExpirationInMs;
@@ -26,25 +26,24 @@ public class JwtTokenProvider {
 
     public String generateToken(Authentication authentication){
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-
         Date now = new Date();
-
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
-        Claims claims = Jwts.claims().setSubject(userPrincipal.getEmail());
-
+//        Claims claims = Jwts.claims().setSubject(userPrincipal.getEmail());
         return Jwts.builder()
-                .setClaims(claims)
+                .setId(userPrincipal.getUsername())
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512,"JWTSuperSecretKey")
+                .signWith(SignatureAlgorithm.HS512,jwtSecret)
                 .setHeaderParam("typ","JWT")
+                .claim("role", userPrincipal.getAuthorities())
+                .claim("email", userPrincipal.getEmail())
+                .claim("username", userPrincipal.getUsername())
                 .compact();
-
     }
 
     public Long getUserIdFromJWT(String token){
         Claims claims = Jwts.parser()
-                .setSigningKey("JWTSuperSecretKey")
+                .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
                 .getBody();
 
@@ -53,7 +52,7 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String authToken){
         try{
-            Jwts.parser().setSigningKey("JWTSuperSecretKey").parseClaimsJws(authToken);
+            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
             return true;
         }catch(SignatureException ex){
             logger.error("Invalid JWT signature");

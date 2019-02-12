@@ -10,6 +10,7 @@ import com.iswAcademy.Voucherz.mailservice.IMailService;
 import com.iswAcademy.Voucherz.mailservice.Mail;
 import com.iswAcademy.Voucherz.service.ITokenService;
 import com.iswAcademy.Voucherz.service.IUserService;
+import com.iswAcademy.Voucherz.util.TimeFormat;
 import com.iswAcademy.Voucherz.util.TokenGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -91,8 +92,9 @@ public class ForgotPasswordController {
         CustomMessage message = new CustomMessage();
         message.setDescription("User with email Address " + user.getEmail() + " logged in");
         message.setRole(user.getRole());
+        message.setEmail(user.getEmail());
         message.setEvent("Forgot Password request");
-        message.setEventdate(LocalDateTime.ofInstant(new Date().toInstant(), ZoneId.systemDefault()).toString());
+        message.setEventdate(TimeFormat.newtime());
         messageSender.sendMessage(message);
         return "redirect:/forgot-password?success";
     }

@@ -11,12 +11,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
-//this class handles authorisation and authentication
 public class UserPrincipal implements UserDetails {
     private  Long id;
 
-    //this username will be the user email
     @JsonIgnore
     private String username;
 
@@ -36,15 +35,8 @@ public class UserPrincipal implements UserDetails {
     }
 
     public static UserPrincipal create(User user){
-//        List<GrantedAuthority> authorities = user.getRoles().stream().map(role->
-//                new SimpleGrantedAuthority(role.getName().name())
-//        ).collect(Collectors.toList());
-
         List<GrantedAuthority> authorities = Arrays.asList(new SimpleGrantedAuthority(user.getRole()));
-
-
         return new UserPrincipal(
-
                 user.getId(),
                 user.getFirstName(),
                 user.getPassword(),
@@ -53,7 +45,6 @@ public class UserPrincipal implements UserDetails {
         );
 
     }
-
 
     public Long getId() {
         return id;
@@ -77,9 +68,6 @@ public class UserPrincipal implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
-
-
-    //because its implementing the UserDetails it has to implement all the method in the class
 
 //    @Override
 //    public String getUsername() {
